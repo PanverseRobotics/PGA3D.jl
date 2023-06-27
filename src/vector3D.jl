@@ -15,9 +15,8 @@ get_x(v::Vector3D) = internal_vec(v)[1]
 get_y(v::Vector3D) = internal_vec(v)[2]
 get_z(v::Vector3D) = internal_vec(v)[3]
 
-# Provide an AbstractArray interface even though we're not subtyping it. 
-
 # Define the basic arithmetic operations for Vector3D
+# I think this interface prevents broadcast fusion from happening but we can fix that later if we need the extra performance.
 +(v::Vector3D, w::Vector3D) = Vector3D((v.vec .+ w.vec)...)
 -(v::Vector3D, w::Vector3D) = Vector3D((v.vec .- w.vec)...)
 ⋅(v::Vector3D, w::Vector3D) = sum(v.vec .* w.vec)

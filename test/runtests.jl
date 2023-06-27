@@ -1,5 +1,8 @@
 using Test, SafeTestsets
+using Logging
 using PrettyPrinting
+
+@info "Starting tests"
 
 fulltestset = @testset "PGA3D.jl" begin
 
@@ -18,7 +21,14 @@ fulltestset = @testset "PGA3D.jl" begin
     @safetestset "motor3D.jl" begin
         include("test_motor3D.jl")
     end
+    @safetestset "conversions.jl" begin
+        include("test_conversions.jl")
+    end
 
 end
 
-#@info pprint(fulltestset.results)
+@info "Testing finished executing."
+
+@info "Test Results:"
+@info pprint(fulltestset.results)
+@info "Done with runtest."
