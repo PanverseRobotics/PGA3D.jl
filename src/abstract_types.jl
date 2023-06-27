@@ -10,7 +10,7 @@ end
 
 # Provide an AbstractArray interface even though we're not subtyping it. 
 # Most subtypes will override the size and length for ease of compiler constant propagation/inference but not the getindex.
-getindex(el::AbstractPGA3Element, i) = internal_vec(el)[i]
+getindex(el::AbstractPGA3Element, i::Integer) = internal_vec(el)[i]
 size(el::AbstractPGA3Element) = size(internal_vec(el))
 length(el::AbstractPGA3Element) = length(internal_vec(el))
 
