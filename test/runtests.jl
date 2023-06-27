@@ -2,6 +2,9 @@ using Test, SafeTestsets
 
 @safetestset "PGA3D.jl" begin
 
+    @safetestset "vector3D.jl" begin
+        include("test_vector3D.jl")
+    end
     @safetestset "vector4D.jl" begin
         include("test_vector4D.jl")
     end
