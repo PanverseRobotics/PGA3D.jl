@@ -1,4 +1,3 @@
-using PGA3D
 using Test, SafeTestsets
 
 @safetestset "PGA3D.jl" begin
