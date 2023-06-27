@@ -1,6 +1,16 @@
 using PGA3D
-using Test
+using Test, SafeTestsets
 
-@testset "PGA3D.jl" begin
-    # Write your tests here.
+@safetestset "PGA3D.jl" begin
+
+    @safetestset "Point3D.jl" begin
+        include("test_Point3D.jl")
+    end
+    @safetestset "Line3D.jl" begin
+        include("test_Line3D.jl")
+    end
+    @safetestset "Motor3D.jl" begin
+        include("test_Motor3D.jl")
+    end
+
 end

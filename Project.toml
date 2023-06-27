@@ -3,6 +3,9 @@ uuid = "b584a3d5-b956-4693-a7c7-2e98b50bfaa1"
 authors = ["Aperiodic Laboratories"]
 version = "1.0.0-DEV"
 
+[deps]
+SafeTestsets = "1bc83da4-3b8d-516f-aca4-4fe02f6d838f"
+
 [compat]
 julia = "1"
 
