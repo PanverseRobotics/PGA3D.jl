@@ -17,4 +17,3 @@ abstract type AbstractVector4D{T<:Real} <: AbstractPGA3Element{T} end
 
 abstract type AbstractVector3D{T<:Real} <: AbstractPGA3Element{T} end
 
-
