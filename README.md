@@ -6,3 +6,5 @@
 [![Coverage](https://codecov.io/gh/zoemcc/PGA3D.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/zoemcc/PGA3D.jl)
 [![Coverage](https://coveralls.io/repos/github/zoemcc/PGA3D.jl/badge.svg?branch=main)](https://coveralls.io/github/zoemcc/PGA3D.jl?branch=main)
 [![PkgEval](https://JuliaCI.github.io/NanosoldierReports/pkgeval_badges/P/PGA3D.svg)](https://JuliaCI.github.io/NanosoldierReports/pkgeval_badges/report.html)
+
+A fast, low level implementation of the core types of 3D Projective Geometric Algebra (PGA3D), optimized for robotics applications.  
