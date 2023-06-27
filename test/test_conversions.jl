@@ -1,12 +1,12 @@
-using Test, SafeTestsets
+using Test, SafeTestsets, Logging, PrettyPrinting
 
 @safetestset "Point3D" begin
-    using Test, SafeTestsets
+    using Test, SafeTestsets, Logging, PrettyPrinting
 
 
     @safetestset "Default Constructor" begin
         using PGA3D
-        using Test, SafeTestsets
+        using Test, SafeTestsets, Logging, PrettyPrinting
 
         @testset "Point Int" begin
             pointint = Point3D(1, 2, 3)

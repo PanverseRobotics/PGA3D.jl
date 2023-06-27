@@ -1,6 +1,4 @@
-using Test, SafeTestsets
-using Logging
-using PrettyPrinting
+using Test, SafeTestsets, Logging, PrettyPrinting
 
 @info "Starting tests"
 

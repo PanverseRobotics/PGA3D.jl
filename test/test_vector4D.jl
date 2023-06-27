@@ -1,11 +1,11 @@
-using Test, SafeTestsets
+using Test, SafeTestsets, Logging, PrettyPrinting
 
 @safetestset "Constructor" begin
-    using Test, SafeTestsets
+    using Test, SafeTestsets, Logging, PrettyPrinting
 
     @safetestset "Default Constructor" begin
         using PGA3D
-        using Test, SafeTestsets
+        using Test, SafeTestsets, Logging, PrettyPrinting
 
         @testset "Vector Int" begin
             vectorint = Vector4D(1, 2, 3, 4)
