@@ -2,14 +2,17 @@ using Test, SafeTestsets
 
 @safetestset "PGA3D.jl" begin
 
-    @safetestset "Point3D.jl" begin
-        include("test_Point3D.jl")
+    @safetestset "vector4D.jl" begin
+        include("test_vector4D.jl")
     end
-    @safetestset "Line3D.jl" begin
-        include("test_Line3D.jl")
+    @safetestset "point3D.jl" begin
+        include("test_point3D.jl")
     end
-    @safetestset "Motor3D.jl" begin
-        include("test_Motor3D.jl")
+    @safetestset "line3D.jl" begin
+        include("test_line3D.jl")
+    end
+    @safetestset "motor3D.jl" begin
+        include("test_motor3D.jl")
     end
 
 end
