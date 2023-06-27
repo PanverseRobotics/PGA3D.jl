@@ -1,8 +1,10 @@
 module PGA3D
 
+import LinearAlgebra: ⋅, dot, norm
+import Base: +, -, *, /, ==, zero, one, abs, convert, getindex, length, size
+
 using StaticArrays
 using LinearAlgebra
-import Base: +, -, *, /, ==, zero, one, abs, convert, getindex, length, size
 
 include("abstract_types.jl")
 include("vector3D.jl")
