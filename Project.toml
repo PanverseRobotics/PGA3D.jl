@@ -4,14 +4,15 @@ authors = ["Aperiodic Laboratories"]
 version = "1.0.0-DEV"
 
 [deps]
-SafeTestsets = "1bc83da4-3b8d-516f-aca4-4fe02f6d838f"
 StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
 
 [compat]
 julia = "1"
 
 [extras]
+PrettyPrinting = "54e16d92-306c-5ea0-a30b-337be88ac337"
+SafeTestsets = "1bc83da4-3b8d-516f-aca4-4fe02f6d838f"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [targets]
-test = ["Test"]
+test = ["PrettyPrinting", "SafeTestsets", "Test"]

@@ -1,6 +1,7 @@
 using Test, SafeTestsets
+using PrettyPrinting
 
-@safetestset "PGA3D.jl" begin
+fulltestset = @testset "PGA3D.jl" begin
 
     @safetestset "vector3D.jl" begin
         include("test_vector3D.jl")
@@ -19,3 +20,5 @@ using Test, SafeTestsets
     end
 
 end
+
+#@info pprint(fulltestset.results)
