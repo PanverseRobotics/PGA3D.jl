@@ -6,6 +6,10 @@ struct Point3D{T<:Real} <: AbstractVector4D{T}
         vec = SVector{4,T}(promote(x, y, z, one(T))...)
         new{T}(vec)
     end
+
+    function Point3D(vec::SVector{4,T}) where {T<:Real}
+        new{T}(vec)
+    end
 end
 
 internal_vec(p::Point3D) = p.vec

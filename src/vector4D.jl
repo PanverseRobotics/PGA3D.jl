@@ -8,6 +8,10 @@ struct Vector4D{T<:Real} <: AbstractVector4D{T}
         new{T}(vec)
     end
 
+    function Vector4D(vec::SVector{4,T}) where {T<:Real}
+        new{T}(vec)
+    end
+
 end
 
 internal_vec(v::Vector4D) = v.vec
@@ -25,5 +29,13 @@ Vector4D(el::AbstractPGA3Element{T}) where {T<:Real} = Base.convert(Vector4D{T},
 -(v::Vector4D, w::Vector4D) = Vector4D((v.vec .- w.vec)...)
 ⋅(v::Vector4D, w::Vector4D) = sum(v.vec .* w.vec)
 dot(v::Vector4D, w::Vector4D) = v ⋅ w
+
+
+bulk_norm(v::Vector4D) = norm((internal_vec(v)[1:3]))
+weight_norm(v::Vector4D) = abs(get_w(v))
+
+unitize(v::Vector4D{T}) where {T<:Real} = Vector4D(internal_vec(v) .* (1 / get_w(v)))
+#unitize(v::Vector4D{T}) where {T<:Real} = unitize{Vector4D{T}}(v)
+#unitize{Point3D{T}}(v::Vector4D{T}) where {T<:Real} = Point3D(internal_vec(v) .* (1 / get_w(v)))
 
 

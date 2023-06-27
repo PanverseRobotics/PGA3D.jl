@@ -7,6 +7,10 @@ struct Vector3D{T<:Real} <: AbstractVector3D{T}
         vec = SVector{3,T}(promote(x, y, z)...)
         new{T}(vec)
     end
+
+    function Vector3D(vec::SVector{3,T}) where {T<:Real}
+        new{T}(vec)
+    end
 end
 
 internal_vec(v::Vector3D) = v.vec
