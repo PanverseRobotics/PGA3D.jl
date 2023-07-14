@@ -1,5 +1,5 @@
 
-line_fromto(from::Point3D, to::Point3D) = Line3D(to[1] - from[1], to[2] - from[2], to[3] - from[3], cross(SA[from[1], from[2], from[3]], SA[to[1], to[2], to[3]])...)
+line_fromto(from::Point3D, to::Point3D) = unitize(Line3D(to[1] - from[1], to[2] - from[2], to[3] - from[3], cross(SA[from[1], from[2], from[3]], SA[to[1], to[2], to[3]])...))
 
 
 motor_fromto(from::Point3D, to::Point3D) = Motor3D(0, 0, 0, -1, (from[1] - to[1]) * (1 // 2), (from[2] - to[2]) * (1 // 2), (from[3] - to[3]) * (1 // 2), 0)
