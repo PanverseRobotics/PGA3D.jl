@@ -7,6 +7,6 @@ function transform(p::Point3D, Q_ununitized::Motor3D)
     Qvp = cross(Qv, p3)
 
     a = cross(Qv, Qvp) .+ ((Qvp .+ Qm) .* Q[4]) .- (Qv .* Q[8]) .+ cross(Qv, Qm)
-    Point3D(p3 .+ a .+ a)
+    Point3D(p3 .+ 2a)
 end
 

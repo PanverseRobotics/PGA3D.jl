@@ -38,8 +38,15 @@ function identity_motor()
     Motor3D(0, 0, 0, 1, 0, 0, 0, 0)
 end
 
-weight_norm(a::Motor3D) = norm((internal_vec(a)[1:4]))
-bulk_norm(a::Motor3D) = norm((internal_vec(a)[5:8]))
+function weight_norm(a::Motor3D)
+    v = internal_vec(a)
+    norm(SA[v[1], v[2], v[3], v[4]])
+end
+
+function bulk_norm(a::Motor3D)
+    v = internal_vec(a)
+    norm(SA[v[5], v[6], v[7], v[8]])
+end
 
 unitize(a::Motor3D) = Motor3D(internal_vec(a) .* (1 / weight_norm(a)))
 
