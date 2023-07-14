@@ -21,14 +21,14 @@ get_y(v::Vector4D) = internal_vec(v)[2]
 get_z(v::Vector4D) = internal_vec(v)[3]
 get_w(v::Vector4D) = internal_vec(v)[4]
 
-Vector4D(el::AbstractPGA3Element{T}) where {T<:Real} = Base.convert(Vector4D{T}, el)
+Vector4D(el::AbstractPGA3DElement{T}) where {T<:Real} = Base.convert(Vector4D{T}, el)
 
 # Define the basic arithmetic operations for Vector4D
 # I think this interface prevents broadcast fusion from happening but we can fix that later if we need the extra performance.
-+(v::Vector4D, w::Vector4D) = Vector4D((v.vec .+ w.vec)...)
--(v::Vector4D, w::Vector4D) = Vector4D((v.vec .- w.vec)...)
-⋅(v::Vector4D, w::Vector4D) = sum(v.vec .* w.vec)
-dot(v::Vector4D, w::Vector4D) = v ⋅ w
++(a::Vector4D, b::Vector4D) = Vector4D((internal_vec(a) .+ internal_vec(b))...)
+-(a::Vector4D, b::Vector4D) = Vector4D((internal_vec(a) .- internal_vec(b))...)
+⋅(a::Vector4D, b::Vector4D) = internal_vec(a) ⋅ internal_vec(b)
+dot(a::Vector4D, b::Vector4D) = a ⋅ b
 
 
 bulk_norm(v::Vector4D) = norm((internal_vec(v)[1:3]))

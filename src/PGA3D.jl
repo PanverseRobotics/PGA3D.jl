@@ -2,6 +2,7 @@ module PGA3D
 
 using StaticArrays
 using LinearAlgebra
+import LinearAlgebra: dot, norm, ⋅
 import Base: +, -, *, /, ==, zero, one, abs, convert, getindex, length, size
 
 include("abstract_types.jl")
@@ -11,8 +12,9 @@ include("point3D.jl")
 include("line3D.jl")
 include("motor3D.jl")
 include("conversions.jl")
+include("element_construction.jl")
 
-export AbstractPGA3Element
+export AbstractPGA3DElement
 # required interface for subtypes of AbstractPGA3Element:
 export internal_vec
 
