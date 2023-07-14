@@ -1,5 +1,8 @@
 module PGA3D
 
+import LinearAlgebra: ⋅, dot, norm
+import Base: +, -, *, /, ==, zero, one, abs, convert, getindex, length, size
+
 using StaticArrays
 using LinearAlgebra
 import LinearAlgebra: dot, norm, ⋅

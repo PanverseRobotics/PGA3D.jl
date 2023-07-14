@@ -10,9 +10,9 @@ end
 
 # Provide an AbstractArray interface even though we're not subtyping it. 
 # Most subtypes will override the size and length for ease of compiler constant propagation/inference but not the getindex.
-getindex(v::AbstractPGA3DElement, i::Int) = internal_vec(v)[i]
-size(::AbstractPGA3DElement) = size(internal_vec(v))
-length(::AbstractPGA3DElement) = length(internal_vec(v))
+getindex(el::AbstractPGA3DElement, i::Int) = internal_vec(el)[i]
+size(el::AbstractPGA3DElement) = size(internal_vec(el))
+length(el::AbstractPGA3DElement) = length(internal_vec(el))
 
 abstract type AbstractVector4D{T<:Real} <: AbstractPGA3DElement{T} end
 
