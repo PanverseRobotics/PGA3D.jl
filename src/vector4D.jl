@@ -16,10 +16,10 @@ end
 
 internal_vec(v::Vector4D) = v.vec
 
-get_x(v::Vector4D) = internal_vec(v)[1]
-get_y(v::Vector4D) = internal_vec(v)[2]
-get_z(v::Vector4D) = internal_vec(v)[3]
-get_w(v::Vector4D) = internal_vec(v)[4]
+get_x(v::Vector4D) = v[1]
+get_y(v::Vector4D) = v[2]
+get_z(v::Vector4D) = v[3]
+get_w(v::Vector4D) = v[4]
 
 Vector4D(el::AbstractPGA3DElement{T}) where {T<:Real} = Base.convert(Vector4D{T}, el)
 
@@ -32,7 +32,7 @@ dot(a::Vector4D, b::Vector4D) = a ⋅ b
 
 Vector4D(el::AbstractPGA3DElement{T}) where {T<:Real} = convert(Vector4D{T}, el)
 
-bulk_norm(v::Vector4D) = norm((internal_vec(v)[1:3]))
+bulk_norm(v::Vector4D) = norm(SA[v[1], v[2], v[3]])
 weight_norm(v::Vector4D) = abs(get_w(v))
 unitize(v::Vector4D) = Vector4D(internal_vec(v) .* (1 / get_w(v)))
 

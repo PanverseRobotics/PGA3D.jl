@@ -32,7 +32,7 @@ Base.:(-)(a::Motor3D, b::Motor3D) = Motor3D(internal_vec(a) .- internal_vec(b))
 #⋅(a::Motor3D, b::Motor3D) = internal_vec(a) ⋅ internal_vec(b)
 #dot(a::Motor3D, b::Motor3D) = a ⋅ b
 
-function Base.:(*)(a::Motor3D, b::Motor3D)
+function Base.:(*)(a::Motor3D, b::Motor3D) # dual quernion geometric product
     Motor3D(
         a[4] * b[1] + a[1] * b[4] + a[2] * b[3] - a[3] * b[2],
         a[4] * b[2] + a[2] * b[4] + a[3] * b[1] - a[1] * b[3],
@@ -44,13 +44,6 @@ function Base.:(*)(a::Motor3D, b::Motor3D)
         a[8] * b[4] - a[5] * b[1] - a[6] * b[2] - a[7] * b[3] + a[4] * b[8] - a[1] * b[5] - a[2] * b[6] - a[3] * b[7]
     )
 end
-#=
- old
-        a[8] * b[3] + a[5] * b[2] - a[6] * b[1] + a[7] * b[4] + b[8] * a[3] - b[5] * a[2] + b[6] * a[1] + b[7] * a[4],
-        a[8] * b[1] + a[5] * b[4] + a[6] * b[3] - a[7] * b[2] + b[8] * a[1] + b[5] * a[4] - b[6] * a[3] + b[7] * a[2],
-        a[8] * b[2] - a[5] * b[3] + a[6] * b[4] + a[7] * b[1] + b[8] * a[2] + b[5] * a[3] + b[6] * a[4] - b[7] * a[1],
-        a[8] * b[4] - a[5] * b[1] - a[6] * b[2] - a[7] * b[3] + b[8] * a[4] - b[5] * a[1] - b[6] * a[2] - b[7] * a[3]
-        =#
 
 identity_motor() = Motor3D(0, 0, 0, 1, 0, 0, 0, 0)
 
