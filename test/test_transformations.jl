@@ -70,6 +70,10 @@ using PGA3D, Test, SafeTestsets, Logging, PrettyPrinting, StaticArrays, Random
             testmatrix = get_transform_matrix(testmotor)
             testmatrixinv = get_inv_transform_matrix(testmotor)
             testmatrix2, testmatrixinv2 = get_transform_and_inv_matrices(testmotor)
+
+            testmatrixneg = get_transform_matrix(-testmotor)
+            @test testmatrixneg ≈ testmatrix
+
             @test testmatrix ≈ testmatrix2
             @test testmatrixinv ≈ testmatrixinv2
             SAI = SA[1.0 0 0 0; 0 1 0 0; 0 0 1 0; 0 0 0 1]
