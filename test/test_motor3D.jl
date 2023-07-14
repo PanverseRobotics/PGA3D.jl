@@ -97,10 +97,13 @@ end
             for i in 1:3
                 testfrom = Point3D(randn(3)...)
                 testto = Point3D(randn(3)...)
-                line_fromto(testfrom, testto)
+                testline = line_fromto(testfrom, testto)
+                testangle = randn()
+                testdisp = randn()
+                testmotor = motor_screw(testline, testangle, testdisp)
 
-                #@test motorrandom * motoridentity ≈ motorrandom
-                #@test motoridentity * motorrandom ≈ motorrandom
+                #@test testmotor * motoridentity ≈ testmotor
+                #@test motoridentity * testmotor ≈ testmotor
             end
         end
     end

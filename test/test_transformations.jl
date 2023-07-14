@@ -60,8 +60,8 @@ using PGA3D, Test, SafeTestsets, Logging, PrettyPrinting, StaticArrays, Random
     @safetestset "Motor to and from TransformMatrix" begin
         using PGA3D, Test, SafeTestsets, Logging, PrettyPrinting, StaticArrays, Random, LinearAlgebra
         for i in 1:100
-            testfrom = Point3D(normalize(randn(3))...)
-            testto = Point3D(normalize(randn(3))...)
+            testfrom = Point3D(randn(3)...)
+            testto = Point3D(randn(3)...)
             testline = line_fromto(testfrom, testto)
             testangle = randn()
             testdisp = randn()
