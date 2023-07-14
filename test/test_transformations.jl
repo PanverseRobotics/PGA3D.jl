@@ -84,12 +84,17 @@ using PGA3D, Test, SafeTestsets, Logging, PrettyPrinting, StaticArrays, Random
             invtransformedpt = transform(testpoint, PGA3D.reverse(testmotor))
             @test internal_vec(invtransformedpt) ≈ invmatrixedpt
 
+            # there are two motors per transform matrix (m and -m), so we need to test that it is generated as one of the two
             testmotor2 = motor_from_transform(testmatrix)
             @test testmotor2 ≈ testmotor || testmotor2 ≈ -testmotor
             testmotorrev2 = motor_from_transform(testmatrixinv)
             @test testmotorrev2 ≈ PGA3D.reverse(testmotor) || testmotorrev2 ≈ -PGA3D.reverse(testmotor)
             @test testmotor2 * testmotorrev2 ≈ motor_identity || testmotor2 * testmotorrev2 ≈ -motor_identity
             @test testmotorrev2 * testmotor2 ≈ motor_identity || testmotorrev2 * testmotor2 ≈ -motor_identity
+
+            testmatrix3, testmatrixinv3 = get_transform_and_inv_matrices(testmotor2)
+            @test testmatrix3 ≈ testmatrix
+            @test testmatrixinv3 ≈ testmatrixinv
         end
     end
 end
