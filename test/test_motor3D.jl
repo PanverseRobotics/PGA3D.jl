@@ -92,7 +92,8 @@ end
     using PGA3D, Test, SafeTestsets, Logging, PrettyPrinting, StaticArrays, Random, LinearAlgebra
     @safetestset "Multiplication" begin
         using PGA3D, Test, SafeTestsets, Logging, PrettyPrinting, StaticArrays, Random, LinearAlgebra
-        @testset "Motor Identity" begin
+        @safetestset "Motor Identity" begin
+            using PGA3D, Test, SafeTestsets, Logging, PrettyPrinting, StaticArrays, Random, LinearAlgebra
             motoridentity = identity_motor()
             for i in 1:100
                 testfrom = Point3D(randn(3)...)
@@ -104,6 +105,34 @@ end
 
                 @test testmotor * motoridentity ≈ testmotor
                 @test motoridentity * testmotor ≈ testmotor
+            end
+        end
+
+        @safetestset "Compare to transform matrix" begin
+            using PGA3D, Test, SafeTestsets, Logging, PrettyPrinting, StaticArrays, Random, LinearAlgebra
+            motoridentity = identity_motor()
+            for i in 1:100
+                testfrom = Point3D(randn(3)...)
+                testto = Point3D(randn(3)...)
+                testline = line_fromto(testfrom, testto)
+                testangle = rand() * 0.5
+                testdisp = rand()
+                testmotor = motor_screw(testline, testangle, testdisp)
+                testmatrix, testmatrixinv = get_transform_and_inv_matrices(testmotor)
+
+                testfrom2 = Point3D(randn(3)...)
+                testto2 = Point3D(randn(3)...)
+                testline2 = line_fromto(testfrom2, testto2)
+                testangle2 = rand() * 0.5
+                testdisp2 = rand()
+                testmotor2 = motor_screw(testline2, testangle2, testdisp2)
+                testmatrix2, testmatrixinv2 = get_transform_and_inv_matrices(testmotor2)
+
+                @test_broken testmatrix * testmatrix2 ≈ get_transform_matrix(testmotor * testmotor2)
+                @test_broken testmatrix * testmatrixinv2 ≈ get_transform_matrix(testmotor * PGA3D.reverse(testmotor2))
+                @test_broken testmatrixinv * testmatrix2 ≈ get_transform_matrix(PGA3D.reverse(testmotor) * testmotor2)
+                @test_broken testmatrixinv * testmatrixinv2 ≈ get_transform_matrix(PGA3D.reverse(testmotor) * PGA3D.reverse(testmotor2))
+
             end
         end
     end
