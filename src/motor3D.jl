@@ -34,6 +34,10 @@ function *(a::Motor3D, b::Motor3D)
     )
 end
 
+function identity_motor()
+    Motor3D(0, 0, 0, 1, 0, 0, 0, 0)
+end
+
 weight_norm(a::Motor3D) = norm((internal_vec(a)[1:4]))
 bulk_norm(a::Motor3D) = norm((internal_vec(a)[5:8]))
 
