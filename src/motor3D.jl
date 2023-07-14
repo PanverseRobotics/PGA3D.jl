@@ -16,6 +16,16 @@ internal_vec(a::Motor3D) = a.vec
 length(::Motor3D) = 8
 size(::Motor3D) = (8,)
 
+
+get_vx(a::Motor3D) = a[1]
+get_vy(a::Motor3D) = a[2]
+get_vz(a::Motor3D) = a[3]
+get_vw(a::Motor3D) = a[4]
+get_mx(a::Motor3D) = a[5]
+get_my(a::Motor3D) = a[6]
+get_mz(a::Motor3D) = a[7]
+get_mw(a::Motor3D) = a[8]
+
 +(a::Motor3D, b::Motor3D) = Motor3D((internal_vec(a) .+ internal_vec(b))...)
 -(a::Motor3D, b::Motor3D) = Motor3D((internal_vec(a) .- internal_vec(b))...)
 #⋅(a::Motor3D, b::Motor3D) = internal_vec(a) ⋅ internal_vec(b)

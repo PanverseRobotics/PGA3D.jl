@@ -27,6 +27,6 @@ end
 
 @info "Testing finished executing."
 
-@info "Test Results:"
-@info pprint(fulltestset.results)
-@info "Done with runtest."
+#@info "Test Results:"
+#@info pprint(fulltestset.results)
+#@info "Done with runtest."

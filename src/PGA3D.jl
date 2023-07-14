@@ -42,5 +42,6 @@ export Vector3D # <: AbstractVector3D
 
 export Line3D
 export Motor3D
+export get_vx, get_vy, get_vz, get_vw, get_mx, get_my, get_mz, get_mw
 
 end
