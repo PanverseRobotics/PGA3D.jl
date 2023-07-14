@@ -14,6 +14,10 @@ end
 
 internal_vec(p::Point3D) = p.vec
 
+function Point3D(vec::SVector{3,T}) where {T<:Real}
+    Point3D(vec[1], vec[2], vec[3])
+end
+
 get_x(p::Point3D) = p[1]
 get_y(p::Point3D) = p[2]
 get_z(p::Point3D) = p[3]

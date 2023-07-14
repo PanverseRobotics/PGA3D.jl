@@ -39,6 +39,103 @@ bulk_norm(a::Motor3D) = norm((internal_vec(a)[5:8]))
 
 unitize(a::Motor3D) = Motor3D(internal_vec(a) .* (1 / weight_norm(a)))
 
+function get_transform_matrix(a_ununitized::Motor3D)
+    a = unitize(a_ununitized)
+    vx2 = a[1] * a[1]
+    vy2 = a[2] * a[2]
+    vz2 = a[3] * a[3]
+
+    A11 = 1 - (vy2 + vz2) * 2
+    A22 = 1 - (vz2 + vx2) * 2
+    A33 = 1 - (vx2 + vy2) * 2
+    A12 = a[1] * a[2]
+    A13 = a[3] * a[1]
+    A23 = a[2] * a[3]
+    A14 = a[2] * a[7] - a[3] * a[6]
+    A24 = a[3] * a[5] - a[1] * a[7]
+    A34 = a[1] * a[6] - a[2] * a[5]
+
+    B12 = a[3] * a[4]
+    B31 = a[2] * a[4]
+    B23 = a[1] * a[4]
+    B14 = a[6] * a[4] - a[3] * a[8]
+    B24 = a[7] * a[4] - a[1] * a[8]
+    B34 = a[5] * a[4] - a[2] * a[8]
+
+    return SA[A11 (A12-B12)*2 (A13+B31)*2 (A14+B14)*2
+        (A12+B12)*2 A22 (A23-B23)*2 (A24+B24)*2
+        (A13-B31)*2 (A23+B23)*2 A33 (A34+B34)*2
+        0 0 0 1
+    ]
+end
+
+function get_inv_transform_matrix(a_ununitized::Motor3D)
+    a = unitize(a_ununitized)
+    vx2 = a[1] * a[1]
+    vy2 = a[2] * a[2]
+    vz2 = a[3] * a[3]
+
+    A11 = 1 - (vy2 + vz2) * 2
+    A22 = 1 - (vz2 + vx2) * 2
+    A33 = 1 - (vx2 + vy2) * 2
+    A12 = a[1] * a[2]
+    A13 = a[3] * a[1]
+    A23 = a[2] * a[3]
+    A14 = a[2] * a[7] - a[3] * a[6]
+    A24 = a[3] * a[5] - a[1] * a[7]
+    A34 = a[1] * a[6] - a[2] * a[5]
+
+    B12 = a[3] * a[4]
+    B31 = a[2] * a[4]
+    B23 = a[1] * a[4]
+    B14 = a[6] * a[4] - a[3] * a[8]
+    B24 = a[7] * a[4] - a[1] * a[8]
+    B34 = a[5] * a[4] - a[2] * a[8]
+
+
+    return SA[A11 (A12+B12)*2 (A13-B31)*2 (A14-B14)*2
+        (A12-B12)*2 A22 (A23+B23)*2 (A24-B24)*2
+        (A13+B31)*2 (A23-B23)*2 A33 (A34-B34)*2
+        0 0 0 1
+    ]
+end
+
+function get_transform_and_inv_matrices(a_ununitized::Motor3D)
+    a = unitize(a_ununitized)
+    vx2 = a[1] * a[1]
+    vy2 = a[2] * a[2]
+    vz2 = a[3] * a[3]
+
+    A11 = 1 - (vy2 + vz2) * 2
+    A22 = 1 - (vz2 + vx2) * 2
+    A33 = 1 - (vx2 + vy2) * 2
+    A12 = a[1] * a[2]
+    A13 = a[3] * a[1]
+    A23 = a[2] * a[3]
+    A14 = a[2] * a[7] - a[3] * a[6]
+    A24 = a[3] * a[5] - a[1] * a[7]
+    A34 = a[1] * a[6] - a[2] * a[5]
+
+    B12 = a[3] * a[4]
+    B31 = a[2] * a[4]
+    B23 = a[1] * a[4]
+    B14 = a[6] * a[4] - a[3] * a[8]
+    B24 = a[7] * a[4] - a[1] * a[8]
+    B34 = a[5] * a[4] - a[2] * a[8]
+
+    matrix = SA[A11 (A12-B12)*2 (A13+B31)*2 (A14+B14)*2
+        (A12+B12)*2 A22 (A23-B23)*2 (A24+B24)*2
+        (A13-B31)*2 (A23+B23)*2 A33 (A34+B34)*2
+        0 0 0 1
+    ]
+    inv_matrix = SA[A11 (A12+B12)*2 (A13-B31)*2 (A14-B14)*2
+        (A12-B12)*2 A22 (A23+B23)*2 (A24-B24)*2
+        (A13+B31)*2 (A23-B23)*2 A33 (A34-B34)*2
+        0 0 0 1
+    ]
+    return (; matrix, inv_matrix)
+end
+
 
 
 
