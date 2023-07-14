@@ -3,7 +3,7 @@ module PGA3D
 using StaticArrays
 using LinearAlgebra
 import LinearAlgebra: dot, norm, ⋅, adjoint, cross
-import Base: +, -, *, /, ==, zero, one, abs, convert, getindex, length, size, isapprox, isequal
+import Base: +, -, *, /, ==, zero, one, abs, convert, getindex, length, size, isapprox, isequal, sqrt
 
 include("abstract_types.jl")
 include("vector3D.jl")

@@ -67,10 +67,21 @@ using PGA3D, Test, SafeTestsets, Logging, PrettyPrinting, StaticArrays, Random
             testdisp = randn()
             testmotor = motor_screw(testline, testangle, testdisp)
             testmatrix = get_transform_matrix(testmotor)
+            testmatrixinv = get_inv_transform_matrix(testmotor)
+            testmatrix2, testmatrixinv2 = get_transform_and_inv_matrices(testmotor)
+            @test testmatrix ≈ testmatrix2
+            @test testmatrixinv ≈ testmatrixinv2
+            SAI = SA[1.0 0 0 0; 0 1 0 0; 0 0 1 0; 0 0 0 1]
+            @test testmatrix * testmatrixinv ≈ SAI
+            @test testmatrixinv * testmatrix ≈ SAI
             testpoint = Point3D(randn(3)...)
-            transformedpt = transform(testfrom, testmotor)
+            transformedpt = transform(testpoint, testmotor)
             matrixedpt = testmatrix * internal_vec(testpoint)
-            #@test internal_vec(transformedpt) ≈ matrixedpt
+            @test internal_vec(transformedpt) ≈ matrixedpt
+            @test testmatrixinv * matrixedpt ≈ internal_vec(testpoint)
+            invmatrixedpt = testmatrixinv * internal_vec(testpoint)
+            invtransformedpt = transform(testpoint, PGA3D.reverse(testmotor))
+            @test internal_vec(invtransformedpt) ≈ invmatrixedpt
         end
     end
 end
