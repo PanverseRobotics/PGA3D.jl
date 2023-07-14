@@ -59,7 +59,8 @@ using PGA3D, Test, SafeTestsets, Logging, PrettyPrinting, StaticArrays, Random
 
     @safetestset "Motor to and from TransformMatrix" begin
         using PGA3D, Test, SafeTestsets, Logging, PrettyPrinting, StaticArrays, Random, LinearAlgebra
-        for i in 1:100
+        motor_identity = identity_motor()
+        for i in 1:250
             testfrom = Point3D(randn(3)...)
             testto = Point3D(randn(3)...)
             testline = line_fromto(testfrom, testto)
@@ -82,6 +83,13 @@ using PGA3D, Test, SafeTestsets, Logging, PrettyPrinting, StaticArrays, Random
             invmatrixedpt = testmatrixinv * internal_vec(testpoint)
             invtransformedpt = transform(testpoint, PGA3D.reverse(testmotor))
             @test internal_vec(invtransformedpt) ≈ invmatrixedpt
+
+            testmotor2 = motor_from_transform(testmatrix)
+            @test testmotor2 ≈ testmotor || testmotor2 ≈ -testmotor
+            testmotorrev2 = motor_from_transform(testmatrixinv)
+            @test testmotorrev2 ≈ PGA3D.reverse(testmotor) || testmotorrev2 ≈ -PGA3D.reverse(testmotor)
+            @test testmotor2 * testmotorrev2 ≈ motor_identity || testmotor2 * testmotorrev2 ≈ -motor_identity
+            @test testmotorrev2 * testmotor2 ≈ motor_identity || testmotorrev2 * testmotor2 ≈ -motor_identity
         end
     end
 end

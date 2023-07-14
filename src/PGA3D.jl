@@ -43,7 +43,7 @@ export line_fromto
 export Motor3D
 export get_vx, get_vy, get_vz, get_vw, get_mx, get_my, get_mz, get_mw
 export identity_motor, motor_fromto, transform, motor_screw, motor_translation
-export get_transform_matrix, get_inv_transform_matrix, get_transform_and_inv_matrices
+export get_transform_matrix, get_inv_transform_matrix, get_transform_and_inv_matrices, motor_from_transform
 
 export bulk_norm, weight_norm, unitize
 

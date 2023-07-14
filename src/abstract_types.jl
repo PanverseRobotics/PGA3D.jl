@@ -2,7 +2,7 @@
 abstract type AbstractPGA3DElement{T<:Real} <: Number end
 
 """
-AbstractPGA3Element are backed by an internal StaticVector so that they can be isbits and leverage high performance deterministic arrays.
+AbstractPGA3Element are backed by an internal StaticVector so that they can be isbits and leverage high performance small arrays.
 """
 function internal_vec(::AbstractPGA3DElement)
     throw("internal_vec is not implemented for type $(typeof(v)).  This function is required for subtypes of AbstractPGA3Element.")

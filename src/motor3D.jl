@@ -29,6 +29,7 @@ get_mw(a::Motor3D) = a[8]
 
 Base.:(+)(a::Motor3D, b::Motor3D) = Motor3D(internal_vec(a) .+ internal_vec(b))
 Base.:(-)(a::Motor3D, b::Motor3D) = Motor3D(internal_vec(a) .- internal_vec(b))
+Base.:(-)(a::Motor3D) = Motor3D(-internal_vec(a))
 #⋅(a::Motor3D, b::Motor3D) = internal_vec(a) ⋅ internal_vec(b)
 #dot(a::Motor3D, b::Motor3D) = a ⋅ b
 
@@ -172,5 +173,62 @@ function get_transform_and_inv_matrices(a_ununitized::Motor3D)
 end
 
 
+function motor_from_transform(M::SMatrix{4,4,T}) where {T<:Real}
+    # rotation stuff first
+    M11 = M[1, 1]
+    M22 = M[2, 2]
+    M33 = M[3, 3]
+    sum = M11 + M22 + M33
+
+    (; vx, vy, vz, vw) = if sum > 0
+        vw = sqrt(sum + 1) * (1 // 2)
+        f = (1 // 4) / vw
+
+        vx = (M[3, 2] - M[2, 3]) * f
+        vy = (M[1, 3] - M[3, 1]) * f
+        vz = (M[2, 1] - M[1, 2]) * f
+
+        (; vx, vy, vz, vw)
+    elseif M11 > M22 && M11 > M33
+        vx = sqrt(M11 - M22 - M33 + 1) * (1 // 2)
+        f = (1 // 4) / vx
+
+        vy = (M[2, 1] + M[1, 2]) * f
+        vz = (M[1, 3] + M[3, 1]) * f
+        vw = (M[3, 2] - M[2, 3]) * f
+
+        (; vx, vy, vz, vw)
+    elseif M22 > M33
+        vy = sqrt(M22 - M33 - M11 + 1) * (1 // 2)
+        f = (1 // 4) / vy
+
+        vx = (M[2, 1] + M[1, 2]) * f
+        vz = (M[3, 2] + M[2, 3]) * f
+        vw = (M[1, 3] - M[3, 1]) * f
+
+        (; vx, vy, vz, vw)
+    else
+        vz = sqrt(M33 - M11 - M22 + 1) * (1 // 2)
+        f = (1 // 4) / vz
+
+        vx = (M[1, 3] + M[3, 1]) * f
+        vy = (M[3, 2] + M[2, 3]) * f
+        vw = (M[2, 1] - M[1, 2]) * f
+
+        (; vx, vy, vz, vw)
+    end
+
+    # ok so now we have the rotational part, let's do the translational part
+    tx = M[1, 4] * (1 // 2)
+    ty = M[2, 4] * (1 // 2)
+    tz = M[3, 4] * (1 // 2)
+
+    mx = vw * tx + vz * ty - vy * tz
+    my = vw * ty + vx * tz - vz * tx
+    mz = vw * tz + vy * tx - vx * ty
+    mw = -vx * tx - vy * ty - vz * tz
+
+    unitize(Motor3D(vx, vy, vz, vw, mx, my, mz, mw))
+end
 
 
