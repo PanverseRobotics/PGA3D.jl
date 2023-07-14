@@ -13,8 +13,9 @@ struct Motor3D{T<:Real} <: AbstractPGA3DElement{T}
 end
 
 internal_vec(a::Motor3D) = a.vec
-length(::Motor3D) = 8
-size(::Motor3D) = (8,)
+
+Base.length(::Motor3D) = 8
+Base.size(::Motor3D) = (8,)
 
 
 get_vx(a::Motor3D) = a[1]
@@ -26,12 +27,12 @@ get_my(a::Motor3D) = a[6]
 get_mz(a::Motor3D) = a[7]
 get_mw(a::Motor3D) = a[8]
 
-+(a::Motor3D, b::Motor3D) = Motor3D((internal_vec(a) .+ internal_vec(b))...)
--(a::Motor3D, b::Motor3D) = Motor3D((internal_vec(a) .- internal_vec(b))...)
+Base.:(+)(a::Motor3D, b::Motor3D) = Motor3D(internal_vec(a) .+ internal_vec(b))
+Base.:(-)(a::Motor3D, b::Motor3D) = Motor3D(internal_vec(a) .- internal_vec(b))
 #⋅(a::Motor3D, b::Motor3D) = internal_vec(a) ⋅ internal_vec(b)
 #dot(a::Motor3D, b::Motor3D) = a ⋅ b
 
-function *(a::Motor3D, b::Motor3D)
+function Base.:(*)(a::Motor3D, b::Motor3D)
     Motor3D(
         a[4] * b[1] + a[1] * b[4] + a[2] * b[3] - a[3] * b[2],
         a[4] * b[2] + a[2] * b[4] + a[3] * b[1] - a[1] * b[3],
@@ -44,21 +45,15 @@ function *(a::Motor3D, b::Motor3D)
     )
 end
 
-function identity_motor()
-    Motor3D(0, 0, 0, 1, 0, 0, 0, 0)
-end
+identity_motor() = Motor3D(0, 0, 0, 1, 0, 0, 0, 0)
 
-function weight_norm(a::Motor3D)
-    v = internal_vec(a)
-    norm(SA[v[1], v[2], v[3], v[4]])
-end
-
-function bulk_norm(a::Motor3D)
-    v = internal_vec(a)
-    norm(SA[v[5], v[6], v[7], v[8]])
-end
+weight_norm(a::Motor3D) = norm(SA[a[1], a[2], a[3], a[4]])
+bulk_norm(a::Motor3D) = norm(SA[a[5], a[6], a[7], a[8]])
 
 unitize(a::Motor3D) = Motor3D(internal_vec(a) .* (1 / weight_norm(a)))
+
+reverse(a::Motor3D) = Motor3D(-a[1], -a[2], -a[3], a[4], -a[5], -a[6], -a[7], a[8])
+anti_reverse(a::Motor3D) = reverse(a)
 
 function get_transform_matrix(a_ununitized::Motor3D)
     a = unitize(a_ununitized)

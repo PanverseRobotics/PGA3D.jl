@@ -13,9 +13,15 @@ struct Line3D{T<:Real} <: AbstractPGA3DElement{T}
 end
 
 internal_vec(a::Line3D) = a.vec
-length(::Line3D) = 6
-size(::Line3D) = (6,)
 
-+(a::Line3D, b::Line3D) = Line3D((internal_vec(a) .+ internal_vec(b))...)
--(a::Line3D, b::Line3D) = Line3D((internal_vec(a) .- internal_vec(b))...)
+Base.length(::Line3D) = 6
+Base.size(::Line3D) = (6,)
+
+Base.:(+)(a::Line3D, b::Line3D) = Line3D((internal_vec(a) .+ internal_vec(b))...)
+Base.:(-)(a::Line3D, b::Line3D) = Line3D((internal_vec(a) .- internal_vec(b))...)
+
+weight_norm(a::Line3D) = norm(SA[a[1], a[2], a[3]])
+bulk_norm(a::Line3D) = norm(SA[a[4], a[5], a[6]])
+
+unitize(a::Line3D) = Line3D(internal_vec(a) .* (1 / weight_norm(a)))
 

@@ -22,6 +22,9 @@ fulltestset = @testset "PGA3D.jl" begin
     @safetestset "conversions.jl" begin
         include("test_conversions.jl")
     end
+    @safetestset "transformations.jl" begin
+        include("test_transformations.jl")
+    end
 
 end
 

@@ -1,12 +1,9 @@
 module PGA3D
 
-import LinearAlgebra: ⋅, dot, norm
-import Base: +, -, *, /, ==, zero, one, abs, convert, getindex, length, size
-
 using StaticArrays
 using LinearAlgebra
-import LinearAlgebra: dot, norm, ⋅
-import Base: +, -, *, /, ==, zero, one, abs, convert, getindex, length, size
+import LinearAlgebra: dot, norm, ⋅, adjoint, cross
+import Base: +, -, *, /, ==, zero, one, abs, convert, getindex, length, size, isapprox, isequal
 
 include("abstract_types.jl")
 include("vector3D.jl")
@@ -41,7 +38,13 @@ export AbstractVector3D # <: AbstractPGA3DElement
 export Vector3D # <: AbstractVector3D
 
 export Line3D
+export line_fromto
+
 export Motor3D
 export get_vx, get_vy, get_vz, get_vw, get_mx, get_my, get_mz, get_mw
+export identity_motor, motor_fromto, transform, motor_screw, motor_translation
+export get_transform_matrix, get_inv_transform_matrix, get_transform_and_inv_matrices
+
+export bulk_norm, weight_norm, unitize
 
 end

@@ -5,7 +5,7 @@ using SafeTestsets, Test, Logging, PrettyPrinting
 
     @safetestset "Default Constructor" begin
         using PGA3D
-        using Test, SafeTestsets, Logging, PrettyPrinting
+        using Test, SafeTestsets, Logging, PrettyPrinting, StaticArrays
 
         @testset "Motor Int" begin
             motorint = Motor3D(1, 2, 3, 4, 5, 6, 7, 8)
@@ -59,5 +59,49 @@ using SafeTestsets, Test, Logging, PrettyPrinting
             @test get_mw(motorpromoted) === 8.0
         end
 
+        @testset "Motor StaticArray" begin
+            motorstaticarray = Motor3D(SA[1, 2, 3, 4, 5, 6, 7, 8])
+            @test motorstaticarray isa Motor3D{Int64}
+            @test get_vx(motorstaticarray) === 1
+            @test get_vy(motorstaticarray) === 2
+            @test get_vz(motorstaticarray) === 3
+            @test get_vw(motorstaticarray) === 4
+            @test get_mx(motorstaticarray) === 5
+            @test get_my(motorstaticarray) === 6
+            @test get_mz(motorstaticarray) === 7
+            @test get_mw(motorstaticarray) === 8
+        end
+
+        @testset "Motor Identity" begin
+            motoridentity = identity_motor()
+            @test motoridentity isa Motor3D{Int64}
+            @test get_vx(motoridentity) === 0
+            @test get_vy(motoridentity) === 0
+            @test get_vz(motoridentity) === 0
+            @test get_vw(motoridentity) === 1
+            @test get_mx(motoridentity) === 0
+            @test get_my(motoridentity) === 0
+            @test get_mz(motoridentity) === 0
+            @test get_mw(motoridentity) === 0
+        end
+
+    end
+end
+
+@safetestset "Operations" begin
+    using PGA3D, Test, SafeTestsets, Logging, PrettyPrinting, StaticArrays, Random, LinearAlgebra
+    @safetestset "Multiplication" begin
+        using PGA3D, Test, SafeTestsets, Logging, PrettyPrinting, StaticArrays, Random, LinearAlgebra
+        @testset "Motor Identity" begin
+            motoridentity = identity_motor()
+            for i in 1:3
+                testfrom = Point3D(randn(3)...)
+                testto = Point3D(randn(3)...)
+                line_fromto(testfrom, testto)
+
+                #@test motorrandom * motoridentity ≈ motorrandom
+                #@test motoridentity * motorrandom ≈ motorrandom
+            end
+        end
     end
 end
