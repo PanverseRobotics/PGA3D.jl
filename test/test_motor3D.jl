@@ -94,7 +94,7 @@ end
         using PGA3D, Test, SafeTestsets, Logging, PrettyPrinting, StaticArrays, Random, LinearAlgebra
         @testset "Motor Identity" begin
             motoridentity = identity_motor()
-            for i in 1:3
+            for i in 1:100
                 testfrom = Point3D(randn(3)...)
                 testto = Point3D(randn(3)...)
                 testline = line_fromto(testfrom, testto)
@@ -102,8 +102,8 @@ end
                 testdisp = randn()
                 testmotor = motor_screw(testline, testangle, testdisp)
 
-                #@test testmotor * motoridentity ≈ testmotor
-                #@test motoridentity * testmotor ≈ testmotor
+                @test testmotor * motoridentity ≈ testmotor
+                @test motoridentity * testmotor ≈ testmotor
             end
         end
     end
