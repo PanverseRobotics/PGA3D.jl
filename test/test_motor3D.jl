@@ -128,10 +128,10 @@ end
                 testmotor2 = motor_screw(testline2, testangle2, testdisp2)
                 testmatrix2, testmatrixinv2 = get_transform_and_inv_matrices(testmotor2)
 
-                @test_broken testmatrix * testmatrix2 ≈ get_transform_matrix(testmotor * testmotor2)
-                @test_broken testmatrix * testmatrixinv2 ≈ get_transform_matrix(testmotor * PGA3D.reverse(testmotor2))
-                @test_broken testmatrixinv * testmatrix2 ≈ get_transform_matrix(PGA3D.reverse(testmotor) * testmotor2)
-                @test_broken testmatrixinv * testmatrixinv2 ≈ get_transform_matrix(PGA3D.reverse(testmotor) * PGA3D.reverse(testmotor2))
+                @test testmatrix * testmatrix2 ≈ get_transform_matrix(testmotor * testmotor2)
+                @test testmatrix * testmatrixinv2 ≈ get_transform_matrix(testmotor * PGA3D.reverse(testmotor2))
+                @test testmatrixinv * testmatrix2 ≈ get_transform_matrix(PGA3D.reverse(testmotor) * testmotor2)
+                @test testmatrixinv * testmatrixinv2 ≈ get_transform_matrix(PGA3D.reverse(testmotor) * PGA3D.reverse(testmotor2))
 
             end
         end
