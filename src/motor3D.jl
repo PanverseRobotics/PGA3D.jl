@@ -75,6 +75,19 @@ function Base.sqrt(q::Motor3D)
     Motor3D(q[1] * b, q[2] * b, q[3] * b, q[4] * b + b, (q[1] * a + q[5]) * b, (q[2] * a + q[6]) * b, (q[3] * a + q[7]) * b, q[8] * (b * (1 // 2)))
 end
 
+function get_position(a_ununitized::Motor3D)
+    a = unitize(a_ununitized)
+    A14 = a[2] * a[7] - a[3] * a[6]
+    A24 = a[3] * a[5] - a[1] * a[7]
+    A34 = a[1] * a[6] - a[2] * a[5]
+
+    B14 = a[5] * a[4] - a[1] * a[8]
+    B24 = a[6] * a[4] - a[2] * a[8]
+    B34 = a[7] * a[4] - a[3] * a[8]
+
+    return Point3D((A14 + B14) * 2, (A24 + B24) * 2, (A34 + B34) * 2)
+end
+
 function get_transform_matrix(a_ununitized::Motor3D)
     a = unitize(a_ununitized)
     vx2 = a[1] * a[1]
