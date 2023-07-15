@@ -23,6 +23,7 @@ function motor_screw(axis::Line3D, angle::Real, displacement::Real)
     )
 end
 
+#=
 function motor_logarithm(m_ununitized::Motor3D)
     # calculate theta_hat 
     m = unitize(m_ununitized)
@@ -59,8 +60,37 @@ function motor_logarithm(m_ununitized::Motor3D)
     theta_hat_perp = Line3D(0, 0, 0, theta_hat_perp_mx, theta_hat_perp_my, theta_hat_perp_mz)
     (; theta_hat, theta_hat_perp, mu, nu)
 end
+=#
+function line_motor_log(m_ununitized::Motor3D)
+    # https://arxiv.org/abs/2206.07496 section 8.2
+    m = unitize(m_ununitized)
+    if m[4] ≈ 1
+        return Line3D(0, 0, 0, m[5], m[6], m[7])
+    else
+        a = 1 / (1 - m[4] * m[4])
+        b = acos(m[4]) * sqrt(a)
+        c = a * m[3] * (1 - m[4] * b)
+        return Line3D(b * m[1], b * m[2], b * m[3], c * m[3] + b * m[5], c * m[2] + b * m[6], c * m[1] + b * m[7])
+    end
+end
+
+function motor_line_exp(axis::Line3D)
+    # https://arxiv.org/abs/2206.07496 section 8.2
+    l = axis[1] * axis[1] + axis[2] * axis[2] + axis[3] * axis[3]
+    if l ≈ 0
+        return Motor3D(0, 0, 0, 1, axis[4], axis[5], axis[6], 0)
+    else
+        m = axis[1] * axis[4] + axis[2] * axis[5] + axis[3] * axis[6]
+        a = sqrt(l)
+        c = cos(a)
+        s = sin(a) / a
+        t = m / l * (c - s)
+        return Motor3D(s * axis[1], s * axis[2], s * axis[3], c, s * axis[1] + t * axis[6], s * axis[2] + t * axis[5], s * axis[3] + t * axis[4], m * s)
+    end
+end
 
 
+#=
 function motor_line_exp(axis::Line3D)
     angleha = weight_norm(axis)
     cosang = cos(angleha)
@@ -95,4 +125,5 @@ function motor_line_exp(axis::Line3D)
         -dispha * sinang
     )
 end
+=#
 
