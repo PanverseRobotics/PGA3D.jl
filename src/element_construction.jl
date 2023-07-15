@@ -61,7 +61,7 @@ function motor_logarithm(m_ununitized::Motor3D)
     (; theta_hat, theta_hat_perp, mu, nu)
 end
 =#
-function line_motor_log(m_ununitized::Motor3D)
+function motor_log(m_ununitized::Motor3D)
     # https://arxiv.org/abs/2206.07496 section 8.2
     m = unitize(m_ununitized)
     if m[4] ≈ 1
@@ -74,7 +74,7 @@ function line_motor_log(m_ununitized::Motor3D)
     end
 end
 
-function motor_line_exp(axis::Line3D)
+function line_exp(axis::Line3D)
     # https://arxiv.org/abs/2206.07496 section 8.2
     l = axis[1] * axis[1] + axis[2] * axis[2] + axis[3] * axis[3]
     if l ≈ 0
