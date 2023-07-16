@@ -28,12 +28,12 @@ Vector4D(el::AbstractPGA3DElement{T}) where {T<:Real} = Base.convert(Vector4D{T}
 Base.:(+)(a::Vector4D, b::Vector4D) = Vector4D((internal_vec(a) .+ internal_vec(b))...)
 Base.:(-)(a::Vector4D, b::Vector4D) = Vector4D((internal_vec(a) .- internal_vec(b))...)
 LinearAlgebra.:(⋅)(a::Vector4D, b::Vector4D) = internal_vec(a) ⋅ internal_vec(b)
-LinearAlgebra.dot(a::Vector4D, b::Vector4D) = a ⋅ b
+#LinearAlgebra.dot(a::Vector4D, b::Vector4D) = a ⋅ b
 Base.:(-)(a::Vector4D) = Vector4D(-internal_vec(a))
 Base.:(*)(a::Vector4D, b::Real) = Vector4D((internal_vec(a) .* b)...)
 Base.:(*)(a::Real, b::Vector4D) = Vector4D((a .* internal_vec(b))...)
 
-Vector4D(el::AbstractPGA3DElement{T}) where {T<:Real} = convert(Vector4D{T}, el)
+#Vector4D(el::AbstractPGA3DElement{T}) where {T<:Real} = convert(Vector4D{T}, el)
 
 bulk_norm(v::Vector4D) = norm(SA[v[1], v[2], v[3]])
 weight_norm(v::Vector4D) = abs(get_w(v))
