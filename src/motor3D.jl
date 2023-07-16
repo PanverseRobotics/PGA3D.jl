@@ -30,6 +30,8 @@ get_mw(a::Motor3D) = a[8]
 Base.:(+)(a::Motor3D, b::Motor3D) = Motor3D(internal_vec(a) .+ internal_vec(b))
 Base.:(-)(a::Motor3D, b::Motor3D) = Motor3D(internal_vec(a) .- internal_vec(b))
 Base.:(-)(a::Motor3D) = Motor3D(-internal_vec(a))
+Base.:(*)(a::Motor3D, b::Real) = Motor3D((internal_vec(a) .* b)...)
+Base.:(*)(a::Real, b::Motor3D) = Motor3D((a .* internal_vec(b))...)
 #⋅(a::Motor3D, b::Motor3D) = internal_vec(a) ⋅ internal_vec(b)
 #dot(a::Motor3D, b::Motor3D) = a ⋅ b
 

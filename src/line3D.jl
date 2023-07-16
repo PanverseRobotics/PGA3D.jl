@@ -22,6 +22,9 @@ line_moment(a::Line3D) = SA[a[4], a[5], a[6]]
 
 Base.:(+)(a::Line3D, b::Line3D) = Line3D((internal_vec(a) .+ internal_vec(b))...)
 Base.:(-)(a::Line3D, b::Line3D) = Line3D((internal_vec(a) .- internal_vec(b))...)
+Base.:(-)(a::Line3D) = Line3D(-internal_vec(a))
+Base.:(*)(a::Line3D, b::Real) = Line3D((internal_vec(a) .* b)...)
+Base.:(*)(a::Real, b::Line3D) = Line3D((a .* internal_vec(b))...)
 
 weight_norm(a::Line3D) = norm(SA[a[1], a[2], a[3]])
 bulk_norm(a::Line3D) = norm(SA[a[4], a[5], a[6]])

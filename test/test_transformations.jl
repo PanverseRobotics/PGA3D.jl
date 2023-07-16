@@ -119,7 +119,7 @@ using PGA3D, Test, SafeTestsets, Logging, PrettyPrinting, StaticArrays, Random
 
             @test testmotorexp ≈ testmotor || testmotorexp ≈ -testmotor
 
-            testbvha = Line3D(internal_vec(testbv) .* 0.5)
+            testbvha = testbv * 0.5
             testmotorexpha = normalize(exp(testbvha))
             testmotorexpha2 = normalize(testmotorexpha * testmotorexpha)
 
