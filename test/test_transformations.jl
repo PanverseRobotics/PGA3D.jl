@@ -105,7 +105,7 @@ using PGA3D, Test, SafeTestsets, Logging, PrettyPrinting, StaticArrays, Random
     @safetestset "Motor log and bivector exp" begin
         using PGA3D, Test, SafeTestsets, Logging, PrettyPrinting, StaticArrays, Random, LinearAlgebra
         motor_identity = identity_motor()
-        for i in 1:10
+        for i in 1:1000
             testfrom = Point3D(randn(3)...)
             testto = Point3D(randn(3)...)
             testline = line_fromto(testfrom, testto)
