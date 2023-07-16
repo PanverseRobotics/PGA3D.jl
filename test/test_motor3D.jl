@@ -143,11 +143,12 @@ end
     end
     @safetestset "Normalization" begin
         using PGA3D, Test, SafeTestsets, Logging, PrettyPrinting, StaticArrays, Random, LinearAlgebra
+        Random.seed!(1)
         for i in 1:1000
             testfrom = Point3D(randn(3)...)
             testto = Point3D(randn(3)...)
             testline = line_fromto(testfrom, testto)
-            testangle = rand() * 0.5
+            testangle = rand()
             testdisp = rand()
             testmotor = motor_screw(testline, testangle, testdisp)
 
@@ -166,6 +167,16 @@ end
 
             #@info dot(testmotor[1:4], testmotor[5:8])
             #@info dot(testmotornormed[1:4], testmotornormed[5:8])
+
+
+            # test against the cheat sheet formula for normalizing that's inefficient
+            m = testmotor
+            mmrev = m * PGA3D.reverse(m)
+            s, t = mmrev[4], mmrev[8]
+            s2 = sqrt(s)
+            study_inv_sqrt = Motor3D(0, 0, 0, 1 / s2, 0, 0, 0, t / (2 * s2^3))
+            new_normed = m * study_inv_sqrt
+            @test isapprox(new_normed, testmotornormed; atol=atol)
         end
 
     end
