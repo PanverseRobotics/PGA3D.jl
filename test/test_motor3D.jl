@@ -141,4 +141,21 @@ end
             end
         end
     end
+    @safetestset "Normalization" begin
+        using PGA3D, Test, SafeTestsets, Logging, PrettyPrinting, StaticArrays, Random, LinearAlgebra
+        for i in 1:1000
+            testfrom = Point3D(randn(3)...)
+            testto = Point3D(randn(3)...)
+            testline = line_fromto(testfrom, testto)
+            testangle = rand() * 0.5
+            testdisp = rand()
+            testmotor = motor_screw(testline, testangle, testdisp)
+
+            testmotornormed = normalize(testmotor)
+            @test isapprox(weight_norm(testmotornormed), 1.0; atol=0.0001)
+            #@info testmotornormed
+            #@test isapprox(dot(testmotornormed[1:4], testmotornormed[5:8]), 0.0; atol=0.0001)
+        end
+
+    end
 end
