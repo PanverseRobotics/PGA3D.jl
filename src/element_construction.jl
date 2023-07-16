@@ -74,19 +74,19 @@ function Base.log(m::Motor3D)
             b * m[1],
             b * m[2],
             b * m[3],
-            c * m[1] + b * m[5],
-            c * m[2] + b * m[6],
-            c * m[3] + b * m[7])
+            b * m[5] - c * m[1],
+            b * m[6] - c * m[2],
+            b * m[7] - c * m[3])
     end
 end
 
 function Base.exp(axis::Line3D)
     # https://arxiv.org/abs/2206.07496 section 8.2
-    l = axis[1] * axis[1] + axis[2] * axis[2] + axis[3] * axis[3]
+    l = line_vector(axis) ⋅ line_vector(axis)
     if l ≈ 0
         return Motor3D(0, 0, 0, 1, axis[4], axis[5], axis[6], 0)
     else
-        m = axis[1] * axis[4] + axis[2] * axis[5] + axis[3] * axis[6]
+        m = -(line_vector(axis) ⋅ line_moment(axis))
         a = sqrt(l)
         c = cos(a)
         s = sin(a) / a
@@ -96,12 +96,20 @@ function Base.exp(axis::Line3D)
             s * axis[2],
             s * axis[3],
             c,
-            s * axis[4] + t * axis[1],
-            s * axis[5] + t * axis[2],
-            s * axis[6] + t * axis[3],
+            s * axis[4] - t * axis[1],
+            s * axis[5] - t * axis[2],
+            s * axis[6] - t * axis[3],
             m * s)
     end
 end
+
+#=
+function Base.exp(axis::Line3D)
+    # from 3D_PGA_Cheat_sheet
+    l = axis[1] * axis[1] + axis[2] * axis[2] + axis[3] * axis[3]
+    m = 
+end
+=#
 
 
 #=

@@ -154,11 +154,11 @@ end
             testmotornormed = normalize(testmotor)
             @test isapprox(weight_norm(testmotornormed), 1.0; atol=0.0001)
             #@info testmotornormed
-            #@test isapprox(dot(testmotornormed[1:4], testmotornormed[5:8]), 0.0; atol=0.0001)
+            @test isapprox(dot(testmotornormed[1:4], testmotornormed[5:8]), 0.0; atol=0.0001)
             testmotornormedsq = testmotornormed * PGA3D.reverse(testmotornormed)
             #@info testmotornormedsq
-            #@test isapprox(testmotornormedsq, identity_motor(); atol=0.0001)
-            #@test get_transform_matrix(testmotor) ≈ get_transform_matrix(testmotornormed)
+            @test isapprox(testmotornormedsq, identity_motor(); atol=0.0001)
+            @test get_transform_matrix(testmotor) ≈ get_transform_matrix(testmotornormed)
             testmotorsq = testmotor * PGA3D.reverse(testmotor)
             #@info testmotorsq
             #@info testmotornormedsq

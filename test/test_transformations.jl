@@ -104,20 +104,32 @@ using PGA3D, Test, SafeTestsets, Logging, PrettyPrinting, StaticArrays, Random
 
     @safetestset "Motor log and bivector exp" begin
         using PGA3D, Test, SafeTestsets, Logging, PrettyPrinting, StaticArrays, Random, LinearAlgebra
+        Random.seed!(1)
         motor_identity = identity_motor()
-        for i in 1:1000
+        for i in 1:2000
             testfrom = Point3D(randn(3)...)
             testto = Point3D(randn(3)...)
             testline = line_fromto(testfrom, testto)
             testangle = rand()
             testdisp = rand()
             testmotor = normalize(motor_screw(testline, testangle, testdisp))
+            @test testmotor * PGA3D.reverse(testmotor) ≈ motor_identity
 
             testbv = log(testmotor)
 
-            testmotorexp = normalize(exp(testbv))
+            testmotorexp = exp(testbv)
+            @test testmotorexp * PGA3D.reverse(testmotorexp) ≈ motor_identity
+            #@info testmotor
+            #@info testbv
+            #@info testmotorexp
 
-            @test testmotorexp ≈ testmotor || testmotorexp ≈ -testmotor
+            atol = 1e-3
+            @test isapprox(testmotorexp, testmotor; atol=atol) || isapprox(testmotorexp, -testmotor; atol=atol) || isapprox(testmotorexp * PGA3D.reverse(testmotor), motor_identity; atol=atol) || isapprox(testmotorexp * PGA3D.reverse(testmotor), -motor_identity; atol=atol)
+            if !(isapprox(testmotorexp, testmotor; atol=atol) || isapprox(testmotorexp, -testmotor; atol=atol))
+                @info testmotor
+                @info testbv
+                @info testmotorexp
+            end
 
             testbvha = testbv * 0.5
             testmotorexpha = normalize(exp(testbvha))
@@ -127,7 +139,7 @@ using PGA3D, Test, SafeTestsets, Logging, PrettyPrinting, StaticArrays, Random
             #@info "testmotor: $testmotor"
             #@info "testmotorexpha: $testmotorexpha"
             #@info "testmotorexpha2: $testmotorexpha2"
-            @test isapprox(testmotorexpha2, testmotor; atol=0.1) || isapprox(testmotorexpha2, -testmotor; atol=0.1)
+            @test isapprox(testmotorexpha2, testmotor; atol=atol) || isapprox(testmotorexpha2, -testmotor; atol=atol) || isapprox(testmotorexpha2 * PGA3D.reverse(testmotor), motor_identity; atol=atol) || isapprox(testmotorexpha2 * PGA3D.reverse(testmotor), -motor_identity; atol=atol)
 
             testfrom2 = Point3D(randn(3)...)
             testto2 = Point3D(randn(3)...)
@@ -141,7 +153,7 @@ using PGA3D, Test, SafeTestsets, Logging, PrettyPrinting, StaticArrays, Random
 
             #@info "testmotor2: $testmotor2"
             #@info "testmotor221: $testmotor221"
-            #@test isapprox(testmotor221, testmotor2; atol=0.1) || isapprox(testmotor221, -testmotor2; atol=0.1)
+            @test testmotor221 ≈ testmotor2 || testmotor221 ≈ -testmotor2
 
             testbv21 = log(testmotor21)
             testmotor212 = normalize(exp(testbv21))
@@ -149,7 +161,7 @@ using PGA3D, Test, SafeTestsets, Logging, PrettyPrinting, StaticArrays, Random
 
             #@info "testmotor2: $testmotor2"
             #@info "testmotor222: $testmotor222"
-            #@test isapprox(testmotor222, testmotor2; atol=0.1) || isapprox(testmotor222, -testmotor2; atol=0.1)
+            @test isapprox(testmotor222, testmotor2; atol=atol) || isapprox(testmotor222, -testmotor2; atol=atol)
 
 
         end
