@@ -52,6 +52,13 @@ weight_norm(a::Motor3D) = norm(SA[a[1], a[2], a[3], a[4]])
 bulk_norm(a::Motor3D) = norm(SA[a[5], a[6], a[7], a[8]])
 
 unitize(a::Motor3D) = Motor3D(internal_vec(a) .* (1 / weight_norm(a)))
+function LinearAlgebra.normalize(m::Motor3D)
+    A = 1 / weight_norm(m)
+    B = (m[4] * m[8] - (m[1] * m[5] + m[2] * m[6] + m[3] * m[7])) * A * A * A
+    Motor3D(A * m[1], A * m[2], A * m[3], A * m[4],
+        A * m[5] + B * m[1], A * m[6] + B * m[2], A * m[7] + B * m[3], A * m[8] - B * m[4])
+
+end
 
 reverse(a::Motor3D) = Motor3D(-a[1], -a[2], -a[3], a[4], -a[5], -a[6], -a[7], a[8])
 anti_reverse(a::Motor3D) = reverse(a)

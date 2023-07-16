@@ -61,20 +61,26 @@ function motor_logarithm(m_ununitized::Motor3D)
     (; theta_hat, theta_hat_perp, mu, nu)
 end
 =#
-function motor_log(m_ununitized::Motor3D)
+function Base.log(m::Motor3D)
     # https://arxiv.org/abs/2206.07496 section 8.2
-    m = unitize(m_ununitized)
-    if m[4] ≈ 1
+    #m = unitize(m_ununitized)
+    if abs(m[4]) ≈ 1
         return Line3D(0, 0, 0, m[5], m[6], m[7])
     else
         a = 1 / (1 - m[4] * m[4])
         b = acos(m[4]) * sqrt(a)
-        c = a * m[3] * (1 - m[4] * b)
-        return Line3D(b * m[1], b * m[2], b * m[3], c * m[3] + b * m[5], c * m[2] + b * m[6], c * m[1] + b * m[7])
+        c = a * m[8] * (1 - m[4] * b)
+        return Line3D(
+            b * m[1],
+            b * m[2],
+            b * m[3],
+            c * m[1] + b * m[5],
+            c * m[2] + b * m[6],
+            c * m[3] + b * m[7])
     end
 end
 
-function line_exp(axis::Line3D)
+function Base.exp(axis::Line3D)
     # https://arxiv.org/abs/2206.07496 section 8.2
     l = axis[1] * axis[1] + axis[2] * axis[2] + axis[3] * axis[3]
     if l ≈ 0
@@ -85,7 +91,15 @@ function line_exp(axis::Line3D)
         c = cos(a)
         s = sin(a) / a
         t = m / l * (c - s)
-        return Motor3D(s * axis[1], s * axis[2], s * axis[3], c, s * axis[1] + t * axis[6], s * axis[2] + t * axis[5], s * axis[3] + t * axis[4], m * s)
+        return Motor3D(
+            s * axis[1],
+            s * axis[2],
+            s * axis[3],
+            c,
+            s * axis[4] + t * axis[1],
+            s * axis[5] + t * axis[2],
+            s * axis[6] + t * axis[3],
+            m * s)
     end
 end
 

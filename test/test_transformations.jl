@@ -60,7 +60,7 @@ using PGA3D, Test, SafeTestsets, Logging, PrettyPrinting, StaticArrays, Random
     @safetestset "Motor to and from TransformMatrix" begin
         using PGA3D, Test, SafeTestsets, Logging, PrettyPrinting, StaticArrays, Random, LinearAlgebra
         motor_identity = identity_motor()
-        for i in 1:250
+        for i in 1:1000
             testfrom = Point3D(randn(3)...)
             testto = Point3D(randn(3)...)
             testline = line_fromto(testfrom, testto)
@@ -99,6 +99,37 @@ using PGA3D, Test, SafeTestsets, Logging, PrettyPrinting, StaticArrays, Random
             testmatrix3, testmatrixinv3 = get_transform_and_inv_matrices(testmotor2)
             @test testmatrix3 ≈ testmatrix
             @test testmatrixinv3 ≈ testmatrixinv
+        end
+    end
+
+    @safetestset "Motor log and bivector exp" begin
+        using PGA3D, Test, SafeTestsets, Logging, PrettyPrinting, StaticArrays, Random, LinearAlgebra
+        motor_identity = identity_motor()
+        for i in 1:1000
+            testfrom = Point3D(randn(3)...)
+            testto = Point3D(randn(3)...)
+            testline = line_fromto(testfrom, testto)
+            testangle = rand()
+            testdisp = rand()
+            testmotor = normalize(motor_screw(testline, testangle, testdisp))
+
+            testbv = log(testmotor)
+
+            testmotorexp = normalize(exp(testbv))
+
+            @test testmotorexp ≈ testmotor || testmotorexp ≈ -testmotor
+
+            testbvha = Line3D(internal_vec(testbv) .* 0.5)
+            testmotorexpha = normalize(exp(testbvha))
+            testmotorexpha2 = normalize(testmotorexpha * testmotorexpha)
+
+
+            #@info "testmotor: $testmotor"
+            #@info "testmotorexpha: $testmotorexpha"
+            #@info "testmotorexpha2: $testmotorexpha2"
+            @test isapprox(testmotorexpha2, testmotor; atol=0.1) || isapprox(testmotorexpha2, -testmotor; atol=0.1)
+
+            ≈
         end
     end
 end
