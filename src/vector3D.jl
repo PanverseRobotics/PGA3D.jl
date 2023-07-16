@@ -26,5 +26,5 @@ Base.:(-)(v::Vector3D, w::Vector3D) = Vector3D(v.vec .- w.vec)
 LinearAlgebra.:(⋅)(v::Vector3D, w::Vector3D) = v.vec ⋅ w.vec
 LinearAlgebra.dot(v::Vector3D, w::Vector3D) = v ⋅ w
 Base.:(-)(a::Vector3D) = Vector3D(-internal_vec(a))
-Base.:(*)(a::Vector3D, b::Real) = Vector3D((internal_vec(a) .* b)...)
-Base.:(*)(a::Real, b::Vector3D) = Vector3D((a .* internal_vec(b))...)
+Base.:(*)(a::Vector3D, b::Real) = Vector3D((internal_vec(a) .* b))
+Base.:(*)(a::Real, b::Vector3D) = Vector3D((a .* internal_vec(b)))

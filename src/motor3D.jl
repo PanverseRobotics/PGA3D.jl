@@ -30,8 +30,8 @@ get_mw(a::Motor3D) = a[8]
 Base.:(+)(a::Motor3D, b::Motor3D) = Motor3D(internal_vec(a) .+ internal_vec(b))
 Base.:(-)(a::Motor3D, b::Motor3D) = Motor3D(internal_vec(a) .- internal_vec(b))
 Base.:(-)(a::Motor3D) = Motor3D(-internal_vec(a))
-Base.:(*)(a::Motor3D, b::Real) = Motor3D((internal_vec(a) .* b)...)
-Base.:(*)(a::Real, b::Motor3D) = Motor3D((a .* internal_vec(b))...)
+Base.:(*)(a::Motor3D, b::Real) = Motor3D((internal_vec(a) .* b))
+Base.:(*)(a::Real, b::Motor3D) = Motor3D((a .* internal_vec(b)))
 #⋅(a::Motor3D, b::Motor3D) = internal_vec(a) ⋅ internal_vec(b)
 #dot(a::Motor3D, b::Motor3D) = a ⋅ b
 
@@ -61,9 +61,6 @@ function LinearAlgebra.normalize(m::Motor3D)
         A * m[5] + B * m[1], A * m[6] + B * m[2], A * m[7] + B * m[3], A * m[8] - B * m[4])
 end
 
-function motornormsq(m::Motor3D)
-    m[1] * m[1]
-end
 reverse(a::Motor3D) = Motor3D(-a[1], -a[2], -a[3], a[4], -a[5], -a[6], -a[7], a[8])
 anti_reverse(a::Motor3D) = reverse(a)
 
