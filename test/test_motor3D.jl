@@ -152,12 +152,13 @@ end
             testmotor = motor_screw(testline, testangle, testdisp)
 
             testmotornormed = normalize(testmotor)
-            @test isapprox(weight_norm(testmotornormed), 1.0; atol=0.0001)
+            atol = 1e-10
+            @test isapprox(weight_norm(testmotornormed), 1.0; atol=atol)
             #@info testmotornormed
-            @test isapprox(dot(testmotornormed[1:4], testmotornormed[5:8]), 0.0; atol=0.0001)
+            @test isapprox(dot(testmotornormed[1:4], testmotornormed[5:8]), 0.0; atol=atol)
             testmotornormedsq = testmotornormed * PGA3D.reverse(testmotornormed)
             #@info testmotornormedsq
-            @test isapprox(testmotornormedsq, identity_motor(); atol=0.0001)
+            @test isapprox(testmotornormedsq, identity_motor(); atol=atol)
             @test get_transform_matrix(testmotor) ≈ get_transform_matrix(testmotornormed)
             testmotorsq = testmotor * PGA3D.reverse(testmotor)
             #@info testmotorsq
