@@ -111,7 +111,8 @@ end
         @safetestset "Compare to transform matrix" begin
             using PGA3D, Test, SafeTestsets, Logging, PrettyPrinting, StaticArrays, Random, LinearAlgebra
             motoridentity = identity_motor()
-            for i in 1:1
+            Random.seed!(1)
+            for i in 1:1000
                 testfrom = Point3D(randn(3)...)
                 testto = Point3D(randn(3)...)
                 testline = line_fromto(testfrom, testto)
@@ -135,10 +136,10 @@ end
                 #@info testmotor2
                 #@info testmatrix * testmatrix2
                 #@info testmotor * testmotor2
-                #@test testmatrix * testmatrix2 ≈ get_transform_matrix(normalize(testmotor * testmotor2))
-                #@test testmatrix * testmatrixinv2 ≈ get_transform_matrix(normalize(testmotor * PGA3D.reverse(testmotor2)))
-                #@test testmatrixinv * testmatrix2 ≈ get_transform_matrix(normalize(PGA3D.reverse(testmotor) * testmotor2))
-                #@test testmatrixinv * testmatrixinv2 ≈ get_transform_matrix(normalize(PGA3D.reverse(testmotor) * PGA3D.reverse(testmotor2)))
+                @test testmatrix * testmatrix2 ≈ get_transform_matrix(normalize(testmotor * testmotor2))
+                @test testmatrix * testmatrixinv2 ≈ get_transform_matrix(normalize(testmotor * PGA3D.reverse(testmotor2)))
+                @test testmatrixinv * testmatrix2 ≈ get_transform_matrix(normalize(PGA3D.reverse(testmotor) * testmotor2))
+                @test testmatrixinv * testmatrixinv2 ≈ get_transform_matrix(normalize(PGA3D.reverse(testmotor) * PGA3D.reverse(testmotor2)))
 
                 # test that motor reverse is motor inverse for unitized motors
                 @test motoridentity ≈ testmotor * PGA3D.reverse(testmotor)
