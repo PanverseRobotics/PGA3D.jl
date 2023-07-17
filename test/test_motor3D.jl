@@ -117,7 +117,7 @@ end
                 testline = line_fromto(testfrom, testto)
                 testangle = rand() * 0.5
                 testdisp = rand()
-                testmotor = motor_screw(testline, testangle, testdisp)
+                testmotor = normalize(motor_screw(testline, testangle, testdisp))
                 testmatrix, testmatrixinv = get_transform_and_inv_matrices(testmotor)
 
                 testfrom2 = Point3D(randn(3)...)
@@ -125,24 +125,24 @@ end
                 testline2 = line_fromto(testfrom2, testto2)
                 testangle2 = rand() * 0.5
                 testdisp2 = rand()
-                testmotor2 = motor_screw(testline2, testangle2, testdisp2)
+                testmotor2 = normalize(motor_screw(testline2, testangle2, testdisp2))
                 testmatrix2, testmatrixinv2 = get_transform_and_inv_matrices(testmotor2)
 
                 # test that matrix multiplication and inversion are the same as motor multiplication and reversion, respectively
-                @info testmatrix
-                @info testmatrix2
-                @info testmotor
-                @info testmotor2
-                @info testmatrix * testmatrix2
-                @info testmotor * testmotor2
-                #@test testmatrix * testmatrix2 ≈ get_transform_matrix(testmotor * testmotor2)
-                #@test testmatrix * testmatrixinv2 ≈ get_transform_matrix(testmotor * PGA3D.reverse(testmotor2))
-                #@test testmatrixinv * testmatrix2 ≈ get_transform_matrix(PGA3D.reverse(testmotor) * testmotor2)
-                #@test testmatrixinv * testmatrixinv2 ≈ get_transform_matrix(PGA3D.reverse(testmotor) * PGA3D.reverse(testmotor2))
+                #@info testmatrix
+                #@info testmatrix2
+                #@info testmotor
+                #@info testmotor2
+                #@info testmatrix * testmatrix2
+                #@info testmotor * testmotor2
+                #@test testmatrix * testmatrix2 ≈ get_transform_matrix(normalize(testmotor * testmotor2))
+                #@test testmatrix * testmatrixinv2 ≈ get_transform_matrix(normalize(testmotor * PGA3D.reverse(testmotor2)))
+                #@test testmatrixinv * testmatrix2 ≈ get_transform_matrix(normalize(PGA3D.reverse(testmotor) * testmotor2))
+                #@test testmatrixinv * testmatrixinv2 ≈ get_transform_matrix(normalize(PGA3D.reverse(testmotor) * PGA3D.reverse(testmotor2)))
 
                 # test that motor reverse is motor inverse for unitized motors
-                #@test motoridentity ≈ testmotor * PGA3D.reverse(testmotor)
-                #@test motoridentity ≈ PGA3D.reverse(testmotor) * testmotor
+                @test motoridentity ≈ testmotor * PGA3D.reverse(testmotor)
+                @test motoridentity ≈ PGA3D.reverse(testmotor) * testmotor
 
             end
         end
