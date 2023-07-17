@@ -35,6 +35,63 @@ Base.:(*)(a::Real, b::Motor3D) = Motor3D((a .* internal_vec(b)))
 #⋅(a::Motor3D, b::Motor3D) = internal_vec(a) ⋅ internal_vec(b)
 #dot(a::Motor3D, b::Motor3D) = a ⋅ b
 
+# this is the product from the terathon math library but it doesn't do what I think it should
+#=
+function Base.:(*)(b::Motor3D, a::Motor3D) # dual quernion geometric product
+    Motor3D(
+        a[4] * b[1] + a[1] * b[4] + a[2] * b[3] - a[3] * b[2],
+        a[4] * b[2] + a[2] * b[4] + a[3] * b[1] - a[1] * b[3],
+        a[4] * b[3] + a[3] * b[4] + a[1] * b[2] - a[2] * b[1],
+        a[4] * b[4] - a[1] * b[1] - a[2] * b[2] - a[3] * b[3],
+        a[8] * b[1] + a[5] * b[2] - a[6] * b[1] + a[7] * b[4] + b[8] * a[3] - b[5] * a[2] + b[6] * a[1] + b[7] * a[4],
+        a[8] * b[2] + a[5] * b[4] + a[6] * b[3] - a[7] * b[2] + b[8] * a[1] + b[5] * a[4] - b[6] * a[3] + b[7] * a[2],
+        a[8] * b[3] - a[5] * b[3] + a[6] * b[4] + a[7] * b[1] + b[8] * a[2] + b[5] * a[3] + b[6] * a[4] - b[7] * a[1],
+        a[8] * b[4] - a[5] * b[1] - a[6] * b[2] - a[7] * b[3] + b[8] * a[4] - b[5] * a[1] - b[6] * a[2] - b[7] * a[3]
+    )
+end
+=#
+# this is the one from enki's stuff, translated
+function Base.:(*)(a::Motor3D, b::Motor3D)
+    Motor3D(
+        b[1] * a[4] + b[2] * a[3] - b[3] * a[2] + b[4] * a[1],
+        b[2] * a[4] - b[1] * a[3] + b[4] * a[2] + b[3] * a[1],
+        b[3] * a[4] + b[4] * a[3] + b[1] * a[2] - b[2] * a[1],
+        b[4] * a[4] - b[3] * a[3] - b[2] * a[2] - b[1] * a[1],
+        b[5] * a[4] + b[4] * a[5] - b[3] * a[6] + b[2] * a[7] + b[6] * a[3] - b[7] * a[2] - b[8] * a[1] - b[1] * a[8],
+        b[6] * a[4] + b[3] * a[5] + b[4] * a[6] - b[1] * a[7] - b[5] * a[3] - b[8] * a[2] + b[7] * a[1] - b[2] * a[8],
+        b[7] * a[4] - b[2] * a[5] + b[1] * a[6] + b[4] * a[7] - b[8] * a[3] + b[5] * a[2] - b[6] * a[1] - b[3] * a[8],
+        b[8] * a[4] + b[1] * a[5] + b[2] * a[6] + b[3] * a[7] + b[7] * a[3] + b[6] * a[2] + b[5] * a[1] + b[4] * a[8]
+    )
+end
+# res[10]=b[10]*a[0]+b[9]*a[8]-b[8]*a[9]+b[0]*a[10];
+# res[1]=b[1]*a[4]+b[2]*a[3]-b[3]*a[2]+b[4]*a[1];
+# res[9]=b[9]*a[0]-b[10]*a[8]+b[0]*a[9]+b[8]*a[10];
+# res[2]=b[2]*a[4]-b[1]*a[3]+b[4]*a[2]+b[3]*a[1];
+# res[8]=b[8]*a[0]+b[0]*a[8]+b[10]*a[9]-b[9]*a[10];
+# res[3]=b[3]*a[4]+b[4]*a[3]+b[1]*a[2]-b[2]*a[1];
+# res[0]=b[0]*a[0]-b[8]*a[8]-b[9]*a[9]-b[10]*a[10];
+# res[4]=b[4]*a[4]-b[3]*a[3]-b[2]*a[2]-b[1]*a[1];
+# res[5]=b[5]*a[0]+b[0]*a[5]-b[8]*a[6]+b[9]*a[7]+b[6]*a[8]-b[7]*a[9]-b[15]*a[10]-b[10]*a[15];
+# res[5]=b[5]*a[4]+b[4]*a[5]-b[3]*a[6]+b[2]*a[7]+b[6]*a[3]-b[7]*a[2]-b[8]*a[1]-b[1]*a[8];
+# res[6]=b[6]*a[0]+b[8]*a[5]+b[0]*a[6]-b[10]*a[7]-b[5]*a[8]-b[15]*a[9]+b[7]*a[10]-b[9]*a[15];
+# res[6]=b[6]*a[4]+b[3]*a[5]+b[4]*a[6]-b[1]*a[7]-b[5]*a[3]-b[8]*a[2]+b[7]*a[1]-b[2]*a[8];
+# res[7]=b[7]*a[0]-b[9]*a[5]+b[10]*a[6]+b[0]*a[7]-b[15]*a[8]+b[5]*a[9]-b[6]*a[10]-b[8]*a[15];
+# res[7]=b[7]*a[4]-b[2]*a[5]+b[1]*a[6]+b[4]*a[7]-b[8]*a[3]+b[5]*a[2]-b[6]*a[1]-b[3]*a[8];
+# res[15]=b[15]*a[0]+b[10]*a[5]+b[9]*a[6]+b[8]*a[7]+b[7]*a[8]+b[6]*a[9]+b[5]*a[10]+b[0]*a[15];
+# res[8]=b[8]*a[4]+b[1]*a[5]+b[2]*a[6]+b[3]*a[7]+b[7]*a[3]+b[6]*a[2]+b[5]*a[1]+b[4]*a[8];
+# mapping: 0 -> 4, 5->5, 6->6, 7->7, 8 -> 3, 9 -> 2, 10 -> 1, 15 -> 8
+#=
+res[0]=b[0]*a[0]-b[8]*a[8]-b[9]*a[9]-b[10]*a[10]
+res[5]=b[5]*a[0]+b[0]*a[5]-b[8]*a[6]+b[9]*a[7]+b[6]*a[8]-b[7]*a[9]-b[15]*a[10]-b[10]*a[15]
+res[6]=b[6]*a[0]+b[8]*a[5]+b[0]*a[6]-b[10]*a[7]-b[5]*a[8]-b[15]*a[9]+b[7]*a[10]-b[9]*a[15]
+res[7]=b[7]*a[0]-b[9]*a[5]+b[10]*a[6]+b[0]*a[7]-b[15]*a[8]+b[5]*a[9]-b[6]*a[10]-b[8]*a[15]
+res[8]=b[8]*a[0]+b[0]*a[8]+b[10]*a[9]-b[9]*a[10]
+res[9]=b[9]*a[0]-b[10]*a[8]+b[0]*a[9]+b[8]*a[10]
+res[10]=b[10]*a[0]+b[9]*a[8]-b[8]*a[9]+b[0]*a[10]
+res[15]=b[15]*a[0]+b[10]*a[5]+b[9]*a[6]+b[8]*a[7]+b[7]*a[8]+b[6]*a[9]+b[5]*a[10]+b[0]*a[15]
+=#
+#=
+# this is the one that I used to have which is just dual quaternion math
 function Base.:(*)(a::Motor3D, b::Motor3D) # dual quernion geometric product
     Motor3D(
         a[4] * b[1] + a[1] * b[4] + a[2] * b[3] - a[3] * b[2],
@@ -47,6 +104,7 @@ function Base.:(*)(a::Motor3D, b::Motor3D) # dual quernion geometric product
         a[8] * b[4] - a[5] * b[1] - a[6] * b[2] - a[7] * b[3] + a[4] * b[8] - a[1] * b[5] - a[2] * b[6] - a[3] * b[7]
     )
 end
+=#
 
 identity_motor() = Motor3D(0, 0, 0, 1, 0, 0, 0, 0)
 
@@ -64,6 +122,7 @@ function LinearAlgebra.normalize(m::Motor3D)
     return m * study_inv_sqrt
 end
 =#
+#=
 function LinearAlgebra.normalize(m::Motor3D)
     A = 1 / weight_norm(m)
     B = (m[4] * m[8] + m[1] * m[5] + m[2] * m[6] + m[3] * m[7]) * A * A * A / 2
@@ -76,6 +135,21 @@ function LinearAlgebra.normalize(m::Motor3D)
         A * m[6] - B * m[2],
         A * m[7] - B * m[3],
         A * m[8] + B * m[4])
+end
+=#
+
+function LinearAlgebra.normalize(m::Motor3D)
+    A = 1 / weight_norm(m)
+    B = (m[4] * m[8] - (m[1] * m[5] + m[2] * m[6] + m[3] * m[7])) * A * A * A
+    Motor3D(
+        A * m[1],
+        A * m[2],
+        A * m[3],
+        A * m[4],
+        A * m[5] + B * m[1],
+        A * m[6] + B * m[2],
+        A * m[7] + B * m[3],
+        A * m[8] - B * m[4])
 end
 
 reverse(a::Motor3D) = Motor3D(-a[1], -a[2], -a[3], a[4], -a[5], -a[6], -a[7], a[8])
