@@ -145,12 +145,7 @@ end
         using PGA3D, Test, SafeTestsets, Logging, PrettyPrinting, StaticArrays, Random, LinearAlgebra
         Random.seed!(1)
         for i in 1:1000
-            testfrom = Point3D(randn(3)...)
-            testto = Point3D(randn(3)...)
-            testline = line_fromto(testfrom, testto)
-            testangle = rand()
-            testdisp = rand()
-            testmotor = motor_screw(testline, testangle, testdisp)
+            testmotor = Motor3D(randn(8)...)
 
             testmotornormed = normalize(testmotor)
             atol = 1e-10
