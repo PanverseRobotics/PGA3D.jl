@@ -99,6 +99,11 @@ function Base.sqrt(q::Motor3D)
     a = -q[8] * (b * b)
     Motor3D(q[1] * b, q[2] * b, q[3] * b, q[4] * b + b, (q[1] * a + q[5]) * b, (q[2] * a + q[6]) * b, (q[3] * a + q[7]) * b, q[8] * (b * (1 // 2)))
 end
+#= # not sure why this doesn't work
+function Base.sqrt(m::Motor3D)
+    normalize(Motor3D(m[1], m[2], m[3], m[4] + 1, m[5], m[6], m[7], m[8]))
+end
+=#
 
 function get_position(a_ununitized::Motor3D)
     a = unitize(a_ununitized)
