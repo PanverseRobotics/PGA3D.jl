@@ -1,10 +1,36 @@
 
-line_fromto(from::Point3D, to::Point3D) = unitize(Line3D(to[1] - from[1], to[2] - from[2], to[3] - from[3], cross(SA[from[1], from[2], from[3]], SA[to[1], to[2], to[3]])...))
+#line_fromto(from::Point3D, to::Point3D) = unitize(Line3D(to[1] - from[1], to[2] - from[2], to[3] - from[3], cross(SA[from[1], from[2], from[3]], SA[to[1], to[2], to[3]])...))
+line_fromto(from::Point3D, to::Point3D) = normalize(regressive_product(to, from))
+function regressive_product(a::Point3D, b::Point3D)
+    Line3D(-a[1] + b[1],
+        -a[2] + b[2],
+        -a[3] + b[3],
+        -a[2] * b[3] + a[3] * b[2],
+        a[1] * b[3] - a[3] * b[1],
+        -a[1] * b[2] + a[2] * b[1]
+    )
+end
 
 
-motor_fromto(from::Point3D, to::Point3D) = Motor3D(0, 0, 0, 1, (to[1] - from[1]) * (1 // 2), (to[2] - from[2]) * (1 // 2), (to[3] - from[3]) * (1 // 2), 0)
+#motor_fromto(from::Point3D, to::Point3D) = normalize(Motor3D(0, 0, 0, 1, (to[1] - from[1]) * (1 // 2), (to[2] - from[2]) * (1 // 2), (to[3] - from[3]) * (1 // 2), 0))
+function motor_fromto(from::Point3D, to::Point3D)
+    line_rp = line_fromto(from, to)
+    td = norm(internal_vec(to) .- internal_vec(from))
+    exp(-(1 // 2) * td * Line3D(0, 0, 0, -line_rp[1], -line_rp[2], -line_rp[3]))
+end
+#=function motor_fromto(from::Point3D, to::Point3D)
+    res[1] = 0
+    res[2] = 0
+    res[3] = 0
+    res[4] = 0
+    res[5] = -a[1]
+    res[6] = -a[2]
+    res[7] = -a[3]
+    res[8] = 0
+end
+=#
 
-motor_translation(v::Vector3D) = Motor3D(0, 0, 0, 1, v[1] * (1 // 2), v[2] * (1 // 2), v[3] * (1 // 2), 0)
+motor_translation(v::Vector3D) = normalize(Motor3D(0, 0, 0, 1, v[1] * (1 // 2), v[2] * (1 // 2), v[3] * (1 // 2), 0))
 
 function motor_screw(axis::Line3D, angle::Real, displacement::Real)
     dispha = displacement * (1 // 2)

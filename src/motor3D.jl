@@ -193,6 +193,7 @@ function get_position(a_ununitized::Motor3D)
     return Point3D((A14 + B14) * 2, (A24 + B24) * 2, (A34 + B34) * 2)
 end
 
+#=
 function get_transform_matrix(m_unnormalized::Motor3D)
     m = normalize(m_unnormalized)
     #m = m_unnormalized
@@ -218,6 +219,25 @@ function get_transform_matrix(m_unnormalized::Motor3D)
         0 0 0 (a0a0+a4a4+a5a5+a6a6)
     ]
 end
+=#
+function get_transform_matrix(b::Motor3D)
+    SA[
+        (b[4]^2+b[1]^2-(b[2]^2)-(b[3]^2)) (2b[1]*b[2]+2b[4]*b[3]) (2b[1]*b[3]-2b[4]*b[2]) (2b[7]*b[2]-2b[5]*b[4]-2b[8]*b[1]-2b[6]*b[3])
+        (2b[1]*b[2]-2b[4]*b[3]) (b[4]^2+b[2]^2-(b[1]^2)-(b[3]^2)) (2b[4]*b[1]+2b[2]*b[3]) (2b[5]*b[3]-2b[8]*b[2]-2b[6]*b[4]-2b[7]*b[1])
+        (2b[4]*b[2]+2b[1]*b[3]) (2b[2]*b[3]-2b[4]*b[1]) (b[4]^2+b[3]^2-(b[1]^2)-(b[2]^2)) (2b[6]*b[1]-2b[5]*b[2]-2b[8]*b[3]-2b[7]*b[4])
+        0 0 0 (b[4]^2+b[1]^2+b[2]^2+b[3]^2)
+    ]
+end
+#=
+function get_transform_matrix(b::Motor3D)
+    SA[
+        (b[4]^2+b[3]^2-(b[1]^2)-(b[2]^2)) (2b[2]*b[3]-2b[4]*b[1]) (2b[4]*b[2]+2b[1]*b[3]) (2b[6]*b[1]-2b[5]*b[2]-2b[8]*b[3]-2b[7]*b[4])
+        (2b[4]*b[1]+2b[2]*b[3]) (b[4]^2+b[2]^2-(b[1]^2)-(b[3]^2)) (2b[1]*b[2]-2b[4]*b[3]) (2b[5]*b[3]-2b[8]*b[2]-2b[6]*b[4]-2b[7]*b[1])
+        (2b[1]*b[3]-2b[4]*b[2]) (2b[1]*b[2]+2b[4]*b[3]) (b[4]^2+b[1]^2-(b[2]^2)-(b[3]^2)) (2b[7]*b[2]-2b[5]*b[4]-2b[8]*b[1]-2b[6]*b[3])
+        0 0 0 1
+    ]
+end
+=#
 
 #=
 function get_transform_matrix_2(a_ununitized::Motor3D)

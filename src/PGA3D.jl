@@ -5,6 +5,7 @@ using LinearAlgebra
 import LinearAlgebra: dot, norm, ⋅, adjoint, cross, normalize
 import Base: +, -, *, /, ==, zero, one, abs, convert, getindex, length, size, isapprox, isequal, sqrt, exp, log
 
+include("utils.jl")
 include("abstract_types.jl")
 include("vector3D.jl")
 include("vector4D.jl")

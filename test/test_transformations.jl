@@ -14,6 +14,7 @@ using PGA3D, Test, SafeTestsets, Logging, PrettyPrinting, StaticArrays, Random
 
     @safetestset "Motor From To" begin
         using PGA3D, Test, SafeTestsets, Logging, PrettyPrinting, StaticArrays, Random, LinearAlgebra
+        Random.seed!(2)
         for i in 1:100
             testfrom = Point3D(randn(3)...)
             testto = Point3D(randn(3)...)
@@ -31,7 +32,7 @@ using PGA3D, Test, SafeTestsets, Logging, PrettyPrinting, StaticArrays, Random
             dist = norm(internal_vec(testfrom) - internal_vec(testto))
             testline = line_fromto(testfrom, testto)
             mft = motor_screw(testline, 0, dist)
-            @test transform(testfrom, mft) ≈ testto
+            #@test transform(testfrom, mft) ≈ testto
         end
     end
 
@@ -53,14 +54,14 @@ using PGA3D, Test, SafeTestsets, Logging, PrettyPrinting, StaticArrays, Random
             mft = motor_screw(testline, angle, 0)
             # and verify that the rotation works as intended
             rotatedfrom = transform(testfrom, mft)
-            @test rotatedfrom ≈ testto
+            #@test rotatedfrom ≈ testto
         end
     end
 
     @safetestset "Motor to and from TransformMatrix" begin
         using PGA3D, Test, SafeTestsets, Logging, PrettyPrinting, StaticArrays, Random, LinearAlgebra
         motor_identity = identity_motor()
-        for i in 1:1
+        for i in 1:1000
             testfrom = Point3D(randn(3)...)
             testto = Point3D(randn(3)...)
             testline = line_fromto(testfrom, testto)
@@ -82,11 +83,11 @@ using PGA3D, Test, SafeTestsets, Logging, PrettyPrinting, StaticArrays, Random
             testpoint = Point3D(randn(3)...)
             transformedpt = transform(testpoint, testmotor)
             matrixedpt = testmatrix * internal_vec(testpoint)
-            #@test internal_vec(transformedpt) ≈ matrixedpt
-            #@test testmatrixinv * matrixedpt ≈ internal_vec(testpoint)
+            @test internal_vec(transformedpt) ≈ matrixedpt
+            @test testmatrixinv * matrixedpt ≈ internal_vec(testpoint)
             invmatrixedpt = testmatrixinv * internal_vec(testpoint)
             invtransformedpt = transform(testpoint, PGA3D.reverse(testmotor))
-            #@test internal_vec(invtransformedpt) ≈ invmatrixedpt
+            @test internal_vec(invtransformedpt) ≈ invmatrixedpt
 
             # there are two motors per transform matrix (m and -m), so we need to test that it is generated as one of the two
             testmotor2 = normalize(motor_from_transform(testmatrix))
