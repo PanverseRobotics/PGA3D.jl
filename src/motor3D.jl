@@ -192,7 +192,32 @@ function get_position(a_ununitized::Motor3D)
     return Point3D((A14 + B14) * 2, (A24 + B24) * 2, (A34 + B34) * 2)
 end
 
-function get_transform_matrix(a_ununitized::Motor3D)
+function get_transform_matrix(m_unnormalized::Motor3D)
+    m = normalize(m_unnormalized)
+    a0, a1, a2, a3, a4, a5, a6, a7 = m[4], m[5], m[6], m[7], m[2], m[1], m[3], m[8]
+    _2a0 = 2a0
+    _2a4 = 2a4
+    _2a5 = 2a5
+    a0a0 = a0 * a0
+    a4a4 = a4 * a4
+    a5a5 = a5 * a5
+    a6a6 = a6 * a6
+    _2a6 = 2 * a6
+    _2a0a4 = _2a0 * a4
+    _2a0a5 = _2a0 * a5
+    _2a0a6 = _2a0 * a6
+    _2a4a5 = _2a4 * a5
+    _2a4a6 = _2a4 * a6
+    _2a5a6 = _2a5 * a6
+    [
+        (a0a0+a4a4-a5a5-a6a6) (_2a4a5+_2a0a6) (_2a4a6-_2a0a5) ((_2a0*a3)+(_2a4*a7)-(_2a6*a2)-(_2a5*a1))
+        (_2a4a5-_2a0a6) (a0a0-a4a4+a5a5-a6a6) (_2a0a4+_2a5a6) ((_2a4*a1)-(_2a0*a2)-(_2a6*a3)+(_2a5*a7))
+        (_2a0a5+_2a4a6) (_2a5a6-_2a0a4) (a0a0-a4a4-a5a5+a6a6) ((_2a0*a1)+(_2a4*a2)+(_2a5*a3)+(_2a6*a7))
+        0 0 0 (a0a0+a4a4+a5a5+a6a6)
+    ]
+end
+
+function get_transform_matrix_2(a_ununitized::Motor3D)
     a = unitize(a_ununitized)
     vx2 = a[1] * a[1]
     vy2 = a[2] * a[2]

@@ -129,6 +129,12 @@ end
                 testmatrix2, testmatrixinv2 = get_transform_and_inv_matrices(testmotor2)
 
                 # test that matrix multiplication and inversion are the same as motor multiplication and reversion, respectively
+                @info testmatrix
+                @info testmatrix2
+                @info testmotor
+                @info testmotor2
+                @info testmatrix * testmatrix2
+                @info testmotor * testmotor2
                 #@test testmatrix * testmatrix2 ≈ get_transform_matrix(testmotor * testmotor2)
                 #@test testmatrix * testmatrixinv2 ≈ get_transform_matrix(testmotor * PGA3D.reverse(testmotor2))
                 #@test testmatrixinv * testmatrix2 ≈ get_transform_matrix(PGA3D.reverse(testmotor) * testmotor2)
