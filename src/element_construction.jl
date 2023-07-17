@@ -12,12 +12,14 @@ function regressive_product(a::Point3D, b::Point3D)
 end
 
 
-#motor_fromto(from::Point3D, to::Point3D) = normalize(Motor3D(0, 0, 0, 1, (to[1] - from[1]) * (1 // 2), (to[2] - from[2]) * (1 // 2), (to[3] - from[3]) * (1 // 2), 0))
+motor_fromto(from::Point3D, to::Point3D) = Motor3D(0, 0, 0, 1, (-to[1] + from[1]) * (1 // 2), (-to[2] + from[2]) * (1 // 2), (-to[3] + from[3]) * (1 // 2), 0)
+#=
 function motor_fromto(from::Point3D, to::Point3D)
     line_rp = line_fromto(from, to)
     td = norm(internal_vec(to) .- internal_vec(from))
     exp(-(1 // 2) * td * Line3D(0, 0, 0, -line_rp[1], -line_rp[2], -line_rp[3]))
 end
+=#
 #=function motor_fromto(from::Point3D, to::Point3D)
     res[1] = 0
     res[2] = 0

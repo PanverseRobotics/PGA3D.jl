@@ -5,6 +5,7 @@ using PGA3D, Test, SafeTestsets, Logging, PrettyPrinting, StaticArrays, Random
 
     @safetestset "Identity" begin
         using PGA3D, Test, SafeTestsets, Logging, PrettyPrinting, StaticArrays, Random
+        Random.seed!(1)
         for i in 1:100
             testpoint = Point3D(randn(3)...)
             motoridentity = identity_motor()
@@ -14,17 +15,23 @@ using PGA3D, Test, SafeTestsets, Logging, PrettyPrinting, StaticArrays, Random
 
     @safetestset "Motor From To" begin
         using PGA3D, Test, SafeTestsets, Logging, PrettyPrinting, StaticArrays, Random, LinearAlgebra
-        Random.seed!(2)
+        Random.seed!(1)
         for i in 1:100
             testfrom = Point3D(randn(3)...)
             testto = Point3D(randn(3)...)
             mft = motor_fromto(testfrom, testto)
+            #@info testfrom
+            #@info testto
+            #@info internal_vec(testto) .- internal_vec(testfrom)
+            #@info mft
+            #@info transform(testfrom, mft)
             @test transform(testfrom, mft) ≈ testto
         end
     end
 
     @safetestset "Motor Screw Displacement" begin
         using PGA3D, Test, SafeTestsets, Logging, PrettyPrinting, StaticArrays, Random, LinearAlgebra
+        Random.seed!(1)
         for i in 1:100
             # generate two random points
             testfrom = Point3D(randn(3)...)
@@ -38,6 +45,7 @@ using PGA3D, Test, SafeTestsets, Logging, PrettyPrinting, StaticArrays, Random
 
     @safetestset "Motor Screw Rotation" begin
         using PGA3D, Test, SafeTestsets, Logging, PrettyPrinting, StaticArrays, Random, LinearAlgebra
+        Random.seed!(1)
         for i in 1:100
             # start with two random normalized points
             testfrom = Point3D(normalize(randn(3))...)
@@ -61,6 +69,7 @@ using PGA3D, Test, SafeTestsets, Logging, PrettyPrinting, StaticArrays, Random
     @safetestset "Motor to and from TransformMatrix" begin
         using PGA3D, Test, SafeTestsets, Logging, PrettyPrinting, StaticArrays, Random, LinearAlgebra
         motor_identity = identity_motor()
+        Random.seed!(1)
         for i in 1:1000
             testfrom = Point3D(randn(3)...)
             testto = Point3D(randn(3)...)

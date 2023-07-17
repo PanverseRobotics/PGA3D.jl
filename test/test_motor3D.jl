@@ -95,6 +95,7 @@ end
         @safetestset "Motor Identity" begin
             using PGA3D, Test, SafeTestsets, Logging, PrettyPrinting, StaticArrays, Random, LinearAlgebra
             motoridentity = identity_motor()
+            Random.seed!(1)
             for i in 1:100
                 testmotor = Motor3D(randn(8)...)
 
