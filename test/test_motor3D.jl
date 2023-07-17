@@ -96,12 +96,7 @@ end
             using PGA3D, Test, SafeTestsets, Logging, PrettyPrinting, StaticArrays, Random, LinearAlgebra
             motoridentity = identity_motor()
             for i in 1:100
-                testfrom = Point3D(randn(3)...)
-                testto = Point3D(randn(3)...)
-                testline = line_fromto(testfrom, testto)
-                testangle = randn()
-                testdisp = randn()
-                testmotor = motor_screw(testline, testangle, testdisp)
+                testmotor = Motor3D(randn(8)...)
 
                 @test testmotor * motoridentity ≈ testmotor
                 @test motoridentity * testmotor ≈ testmotor
@@ -152,14 +147,7 @@ end
         using PGA3D, Test, SafeTestsets, Logging, PrettyPrinting, StaticArrays, Random, LinearAlgebra
         Random.seed!(1)
         for i in 1:1000
-            #testfrom = Point3D(randn(3)...)
-            #testto = Point3D(randn(3)...)
-            #testline = line_fromto(testfrom, testto)
-            #testangle = rand() * 0.5
-            #testdisp = rand()
-            #testmotor = motor_screw(testline, testangle, testdisp)
             testmotor = Motor3D(randn(8)...)
-            #testmotor = exp(Line3D(randn(6)...))
 
             testmotornormed = normalize(testmotor)
             atol = 1e-6
