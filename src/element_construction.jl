@@ -103,13 +103,6 @@ function Base.exp(axis::Line3D)
     end
 end
 
-#=
-function Base.exp(axis::Line3D)
-    # from 3D_PGA_Cheat_sheet
-    l = axis[1] * axis[1] + axis[2] * axis[2] + axis[3] * axis[3]
-    m = 
-end
-=#
 
 
 #=

@@ -165,6 +165,7 @@ Motor3D Terathon::Sqrt(const Motor3D& Q)
 }
 =#
 
+#=
 function Base.sqrt(q::Motor3D)
     if q[4] < 0
         q = Motor3D(-internal_vec(q)) # they represent the same transform
@@ -173,11 +174,11 @@ function Base.sqrt(q::Motor3D)
     a = -q[8] * (b * b)
     Motor3D(q[1] * b, q[2] * b, q[3] * b, q[4] * b + b, (q[1] * a + q[5]) * b, (q[2] * a + q[6]) * b, (q[3] * a + q[7]) * b, q[8] * (b * (1 // 2)))
 end
-#= # not sure why this doesn't work
+=#
+# not sure why this doesn't work
 function Base.sqrt(m::Motor3D)
     normalize(Motor3D(m[1], m[2], m[3], m[4] + 1, m[5], m[6], m[7], m[8]))
 end
-=#
 
 function get_position(a_ununitized::Motor3D)
     a = unitize(a_ununitized)
@@ -193,8 +194,8 @@ function get_position(a_ununitized::Motor3D)
 end
 
 function get_transform_matrix(m_unnormalized::Motor3D)
-    #m = normalize(m_unnormalized)
-    m = m_unnormalized
+    m = normalize(m_unnormalized)
+    #m = m_unnormalized
     a0, a1, a2, a3, a4, a5, a6, a7 = m[4], m[5], m[6], m[7], m[2], m[1], m[3], m[8]
     _2a0 = 2a0
     _2a4 = 2a4
