@@ -193,7 +193,8 @@ function get_position(a_ununitized::Motor3D)
 end
 
 function get_transform_matrix(m_unnormalized::Motor3D)
-    m = normalize(m_unnormalized)
+    #m = normalize(m_unnormalized)
+    m = m_unnormalized
     a0, a1, a2, a3, a4, a5, a6, a7 = m[4], m[5], m[6], m[7], m[2], m[1], m[3], m[8]
     _2a0 = 2a0
     _2a4 = 2a4
@@ -209,7 +210,7 @@ function get_transform_matrix(m_unnormalized::Motor3D)
     _2a4a5 = _2a4 * a5
     _2a4a6 = _2a4 * a6
     _2a5a6 = _2a5 * a6
-    [
+    SA[
         (a0a0+a4a4-a5a5-a6a6) (_2a4a5+_2a0a6) (_2a4a6-_2a0a5) ((_2a0*a3)+(_2a4*a7)-(_2a6*a2)-(_2a5*a1))
         (_2a4a5-_2a0a6) (a0a0-a4a4+a5a5-a6a6) (_2a0a4+_2a5a6) ((_2a4*a1)-(_2a0*a2)-(_2a6*a3)+(_2a5*a7))
         (_2a0a5+_2a4a6) (_2a5a6-_2a0a4) (a0a0-a4a4-a5a5+a6a6) ((_2a0*a1)+(_2a4*a2)+(_2a5*a3)+(_2a6*a7))
@@ -217,6 +218,7 @@ function get_transform_matrix(m_unnormalized::Motor3D)
     ]
 end
 
+#=
 function get_transform_matrix_2(a_ununitized::Motor3D)
     a = unitize(a_ununitized)
     vx2 = a[1] * a[1]
@@ -246,7 +248,12 @@ function get_transform_matrix_2(a_ununitized::Motor3D)
         0 0 0 1
     ]
 end
+=#
 
+function get_inv_transform_matrix(a_ununitized::Motor3D)
+    Base.inv(get_transform_matrix(a_ununitized))
+end
+#=
 function get_inv_transform_matrix(a_ununitized::Motor3D)
     a = unitize(a_ununitized)
     vx2 = a[1] * a[1]
@@ -277,7 +284,14 @@ function get_inv_transform_matrix(a_ununitized::Motor3D)
         0 0 0 1
     ]
 end
+=#
 
+function get_transform_and_inv_matrices(a_ununitized::Motor3D)
+    matrix = get_transform_matrix(a_ununitized)
+    inv_matrix = get_inv_transform_matrix(a_ununitized)
+    (; matrix, inv_matrix)
+end
+#=
 function get_transform_and_inv_matrices(a_ununitized::Motor3D)
     a = unitize(a_ununitized)
     vx2 = a[1] * a[1]
@@ -313,6 +327,7 @@ function get_transform_and_inv_matrices(a_ununitized::Motor3D)
     ]
     return (; matrix, inv_matrix)
 end
+=#
 
 
 function motor_from_transform(M::SMatrix{4,4,T}) where {T<:Real}
