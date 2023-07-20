@@ -92,6 +92,7 @@ using PGA3D, Test, SafeTestsets, Logging, PrettyPrinting, StaticArrays, Random
                 continue
             end
 
+
             testmatrix = get_transform_matrix(testmotor)
             testmatrixinv = get_inv_transform_matrix(testmotor)
             testmatrix2, testmatrixinv2 = get_transform_and_inv_matrices(testmotor)
@@ -113,40 +114,17 @@ using PGA3D, Test, SafeTestsets, Logging, PrettyPrinting, StaticArrays, Random
             @test internal_vec(invtransformedpt) ≈ invmatrixedpt atol = atol
 
             # there are two motors per transform matrix (m and -m), so we need to test that it is generated as one of the two
-            testmotor2 = motor_from_transform(testmatrix)
-            #testmotor2 = testmotor2 * testmotor2
-
-            # these are the ones that are close to wrap-around point. I don't think this is *wrong* per-se, since it's extremely sensitive
-            # but this could lead to undesired behavior if this is relied upon
-            if !(isapprox(testmotor2, testmotor; atol=atol) || isapprox(testmotor2, -testmotor; atol=atol))
-                #@info testmotor
-                #@info testmotor2
-                @info testmatrix
-                #@info testmatrixinv
-                @info i
-                @info testmotor
-                @info testmotor2
-                @info testpoint
-                #@test transform(testmotor2, testpoint) ≈ transform(testmotor, testpoint) atol = atol
-
-                # this is a good sanity check but it's not enough to ensure that the motor is the same
-                @test transform(sqrt(testmotor2 * testmotor2), testpoint) ≈ transform(sqrt(testmotor * testmotor), testpoint) atol = atol
-            else
-                @test isapprox(testmotor2, testmotor; atol=atol) || isapprox(testmotor2, -testmotor; atol=atol)
-            end
+            testmotor2 = normalize(motor_from_transform(testmatrix))
+            @test isapprox(testmotor2, testmotor; atol=atol) || isapprox(testmotor2, -testmotor; atol=atol)
             testmotorrev2 = normalize(motor_from_transform(testmatrixinv))
-            #@test isapprox(testmotorrev2, PGA3D.reverse(testmotor); atol=atol) || isapprox(testmotorrev2, -PGA3D.reverse(testmotor); atol=atol)
-            #@test testmotorrev2 ≈ PGA3D.reverse(testmotor) || testmotorrev2 ≈ -PGA3D.reverse(testmotor)
-            #@info testmotor2
-            #@info testmotorrev2
-            #@info testmotor2 * testmotorrev2
-            #@info testmotor2 * -testmotorrev2
-            #@test testmotor2 * testmotorrev2 ≈ motor_identity || testmotor2 * testmotorrev2 ≈ -motor_identity
-            #@test testmotorrev2 * testmotor2 ≈ motor_identity || testmotorrev2 * testmotor2 ≈ -motor_identity
+            @test isapprox(testmotorrev2, PGA3D.reverse(testmotor); atol=atol) || isapprox(testmotorrev2, -PGA3D.reverse(testmotor); atol=atol)
+            @test testmotorrev2 ≈ PGA3D.reverse(testmotor) || testmotorrev2 ≈ -PGA3D.reverse(testmotor)
+            @test testmotor2 * testmotorrev2 ≈ motor_identity || testmotor2 * testmotorrev2 ≈ -motor_identity
+            @test testmotorrev2 * testmotor2 ≈ motor_identity || testmotorrev2 * testmotor2 ≈ -motor_identity
 
             testmatrix3, testmatrixinv3 = get_transform_and_inv_matrices(testmotor2)
-            #@test testmatrix3 ≈ testmatrix
-            #@test testmatrixinv3 ≈ testmatrixinv
+            @test testmatrix3 ≈ testmatrix
+            @test testmatrixinv3 ≈ testmatrixinv
         end
     end
 

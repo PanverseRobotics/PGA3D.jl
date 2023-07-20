@@ -87,11 +87,20 @@ anti_reverse(a::Motor3D) = reverse(a)
 
 function Base.sqrt(m_input::Motor3D)
     if m_input[1] ≈ -1
+        #@info m_input
+        #@info "hit the sqrt otherpath"
         return normalize(-identity_motor() + m_input)
+        #return exp((1 // 2) * log(normalize(m_input)))
     else
-        normalize(identity_motor() + m_input)
+        return normalize(identity_motor() + m_input)
     end
 end
+
+#=
+function Base.sqrt(m_input::Motor3D)
+    return normalize(sign(m_input[1]) * identity_motor() + m_input)
+end
+=#
 
 function Base.inv(a::Motor3D)
     a1a1 = a[1] * a[1]
@@ -162,7 +171,7 @@ function get_transform_matrix(a::Motor3D)
 end
 
 function get_inv_transform_matrix(a_ununitized::Motor3D)
-    Base.inv(get_transform_matrix(a_ununitized))
+    inv(get_transform_matrix(a_ununitized))
 end
 
 function get_transform_and_inv_matrices(a_ununitized::Motor3D)
@@ -173,33 +182,6 @@ end
 
 
 #=
-function motor_from_transform(M::SMatrix{4,4,T}) where {T<:Number}
-    # thanks to Enki for this excellent labelled script & comments
-    # https://enki.ws/ganja.js/examples/coffeeshop.html#8fjqnxTot
-
-    p1 = Plane3D(M[1, 1], M[1, 2], M[1, 3], M[1, 4])
-    p2 = Plane3D(M[2, 1], M[2, 2], M[2, 3], M[2, 4])
-    p3 = Plane3D(M[3, 1], M[3, 2], M[3, 3], M[3, 4])
-
-    # our initial motor takes plane r1 to e1
-    m1 = normalize(Plane3D(1, 0, 0, 0) * inv(p1))
-
-    # now we can only move in this plane.. so we need to compose with a motor
-    # that happens in this plane, this is the one that moves our current intersection with r1 to e12
-    p12 = p1 ∧ p2
-    m2 = normalize(Line3D(0, 0, 1, 0, 0, 0) * inv(transform(m1, p12))) * m1
-
-    # now finally move along that line for the last plane.
-    # this last part is a guaranteed translation that makes sure the intersection point
-    # of the three input planes is at 1e123.
-    # This is a translation with a distance determined by the third plane along a line
-    # determined by the 2nd plane inside the first plane. 
-    p123 = p12 ∧ p3
-    m3 = normalize(Point3D(0, 0, 0, 1) * inv(transform(m2, p123))) * m2
-
-    return m3
-end
-=#
 function motor_from_transform(M::SMatrix{4,4,T}) where {T<:Number}
     # thanks to Enki for this excellent labelled script & comments
     # https://enki.ws/ganja.js/examples/coffeeshop.html#8fjqnxTot
@@ -226,6 +208,175 @@ function motor_from_transform(M::SMatrix{4,4,T}) where {T<:Number}
 
     return m3
 end
+=#
+
+function motor_from_rotation(M::SMatrix{3,3,T}) where {T<:Number}
+    #M = M'
+    if M[3, 3] < 0
+        if M[1, 1] > M[2, 2]
+            trace = 1 + M[1, 1] - M[2, 2] - M[3, 3]
+            s = 2 * sqrt(trace)
+            if M[2, 3] < M[3, 2]
+                s = -s
+            end
+            sinv = 1 / s
+            q1 = (M[2, 3] - M[3, 2]) * sinv
+            q2 = (1 // 4) * s
+            q3 = (M[1, 2] + M[2, 1]) * sinv
+            q4 = (M[3, 1] + M[1, 3]) * sinv
+            if (trace ≈ 1) && (q1 ≈ 0 && q3 ≈ 0 && q4 ≈ 0)
+                q2 = one(T)
+            end
+        else
+            trace = 1 - M[1, 1] + M[2, 2] - M[3, 3]
+            s = 2 * sqrt(trace)
+            if M[3, 1] < M[1, 3]
+                s = -s
+            end
+            q3 = (1 // 4) * s
+            sinv = 1 / s
+            q1 = (M[3, 1] - M[1, 3]) * sinv
+            q2 = (M[1, 2] + M[2, 1]) * sinv
+            q4 = (M[2, 3] + M[3, 2]) * sinv
+            if (trace ≈ 1) && (q1 ≈ 0 && q2 ≈ 0 && q4 ≈ 0)
+                q3 = one(T)
+            end
+        end
+    else
+        if M[1, 1] < -M[2, 2]
+            trace = 1 - M[1, 1] - M[2, 2] + M[3, 3]
+            s = 2 * sqrt(trace)
+            if M[1, 2] < M[2, 1]
+                s = -s
+            end
+            q4 = (1 // 4) * s
+            sinv = 1 / s
+            q1 = (M[1, 2] - M[2, 1]) * sinv
+            q2 = (M[3, 1] + M[1, 3]) * sinv
+            q3 = (M[2, 3] + M[3, 2]) * sinv
+            if (trace ≈ 1) && (q1 ≈ 0 && q2 ≈ 0 && q3 ≈ 0)
+                q4 = one(T)
+            end
+        else
+            trace = 1 + M[1, 1] + M[2, 2] + M[3, 3]
+            s = 2 * sqrt(trace)
+            q1 = (1 // 4) * s
+            sinv = 1 / s
+            q2 = (M[2, 3] - M[3, 2]) * sinv
+            q3 = (M[3, 1] - M[1, 3]) * sinv
+            q4 = (M[1, 2] - M[2, 1]) * sinv
+            if (trace ≈ 1) && (q2 ≈ 0 && q3 ≈ 0 && q4 ≈ 0)
+                q1 = one(T)
+            end
+        end
+    end
+    @assert q1 >= 0
+    return Motor3D(q1, q2, q3, q4, 0, 0, 0, 0)
+end
+
+function motor_from_transform(M::SMatrix{4,4,T}) where {T<:Number}
+    rot = SA[
+        M[1, 1] M[1, 2] M[1, 3]
+        M[2, 1] M[2, 2] M[2, 3]
+        M[3, 1] M[3, 2] M[3, 3]
+    ]
+    rotq = normalize(motor_from_rotation(rot))
+
+    transpoint = Point3D(M[1, 4], M[2, 4], M[3, 4])
+
+    #unrotatedpt = transform(PGA3D.reverse(rotq), transpoint)
+    #unrotatedpt = transform(rotq, transpoint)
+    unrotatedpt = transpoint
+
+    transl = Motor3D(1, 0, 0, 0, -(1 // 2) * unrotatedpt[1], -(1 // 2) * unrotatedpt[2], -(1 // 2) * unrotatedpt[3], 0)
+    #transl = Motor3D(1, 0, 0, 0, -unrotatedpt[1], -unrotatedpt[2], -unrotatedpt[3], 0)
+    #transl = Motor3D(1, 0, 0, 0, -2 * unrotatedpt[1], -2 * unrotatedpt[2], -2 * unrotatedpt[3], 0)
+    #return normalize(rotq * transl)
+    return normalize(transl * rotq)
+    #return rotq
+end
+#=
+void mat3_normalized_to_quat_fast(float q[4], const float mat[3][3])
+{
+  BLI_ASSERT_UNIT_M3(mat);
+  /* Caller must ensure matrices aren't negative for valid results, see: T24291, T94231. */
+  BLI_assert(!is_negative_m3(mat));
+
+  /* Method outlined by Mike Day, ref: https://math.stackexchange.com/a/3183435/220949
+   * with an additional `sqrtf(..)` for higher precision result.
+   * Removing the `sqrt` causes tests to fail unless the precision is set to 1e-6 or larger. */
+
+  if (mat[2][2] < 0.0f) {
+    if (mat[0][0] > mat[1][1]) {
+      const float trace = 1.0f + mat[0][0] - mat[1][1] - mat[2][2];
+      float s = 2.0f * sqrtf(trace);
+      if (mat[1][2] < mat[2][1]) {
+        /* Ensure W is non-negative for a canonical result. */
+        s = -s;
+      }
+      q[1] = 0.25f * s;
+      s = 1.0f / s;
+      q[0] = (mat[1][2] - mat[2][1]) * s;
+      q[2] = (mat[0][1] + mat[1][0]) * s;
+      q[3] = (mat[2][0] + mat[0][2]) * s;
+      if (UNLIKELY((trace == 1.0f) && (q[0] == 0.0f && q[2] == 0.0f && q[3] == 0.0f))) {
+        /* Avoids the need to normalize the degenerate case. */
+        q[1] = 1.0f;
+      }
+    }
+    else {
+      const float trace = 1.0f - mat[0][0] + mat[1][1] - mat[2][2];
+      float s = 2.0f * sqrtf(trace);
+      if (mat[2][0] < mat[0][2]) {
+        /* Ensure W is non-negative for a canonical result. */
+        s = -s;
+      }
+      q[2] = 0.25f * s;
+      s = 1.0f / s;
+      q[0] = (mat[2][0] - mat[0][2]) * s;
+      q[1] = (mat[0][1] + mat[1][0]) * s;
+      q[3] = (mat[1][2] + mat[2][1]) * s;
+      if (UNLIKELY((trace == 1.0f) && (q[0] == 0.0f && q[1] == 0.0f && q[3] == 0.0f))) {
+        /* Avoids the need to normalize the degenerate case. */
+        q[2] = 1.0f;
+      }
+    }
+  }
+  else {
+    if (mat[0][0] < -mat[1][1]) {
+      const float trace = 1.0f - mat[0][0] - mat[1][1] + mat[2][2];
+      float s = 2.0f * sqrtf(trace);
+      if (mat[0][1] < mat[1][0]) {
+        /* Ensure W is non-negative for a canonical result. */
+        s = -s;
+      }
+      q[3] = 0.25f * s;
+      s = 1.0f / s;
+      q[0] = (mat[0][1] - mat[1][0]) * s;
+      q[1] = (mat[2][0] + mat[0][2]) * s;
+      q[2] = (mat[1][2] + mat[2][1]) * s;
+      if (UNLIKELY((trace == 1.0f) && (q[0] == 0.0f && q[1] == 0.0f && q[2] == 0.0f))) {
+        /* Avoids the need to normalize the degenerate case. */
+        q[3] = 1.0f;
+      }
+    }
+    else {
+      /* NOTE(@campbellbarton): A zero matrix will fall through to this block,
+       * needed so a zero scaled matrices to return a quaternion without rotation, see: T101848. */
+      const float trace = 1.0f + mat[0][0] + mat[1][1] + mat[2][2];
+      float s = 2.0f * sqrtf(trace);
+      q[0] = 0.25f * s;
+      s = 1.0f / s;
+      q[1] = (mat[1][2] - mat[2][1]) * s;
+      q[2] = (mat[2][0] - mat[0][2]) * s;
+      q[3] = (mat[0][1] - mat[1][0]) * s;
+      if (UNLIKELY((trace == 1.0f) && (q[1] == 0.0f && q[2] == 0.0f && q[3] == 0.0f))) {
+        /* Avoids the need to normalize the degenerate case. */
+        q[0] = 1.0f;
+      }
+    }
+    =#
+
 
 #=
 function motor_from_transform(M::SMatrix{4,4,T}) where {T<:Number}
