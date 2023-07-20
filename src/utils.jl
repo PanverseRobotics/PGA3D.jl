@@ -11,13 +11,15 @@ end
 #=
 PGA symbolic calculator
 https://enki.ws/ganja.js/examples/coffeeshop.html#665aoyv6x
-  basis : "1,e0,e1,e2,e3,e01,e02,e03,e23,e31,e12,e021,e013,e032,e123,e0123".split(','),
+basis : "1,e1,e2,e3,e0,e23,e31,e12,e01,e02,e03,e032,e013,e021,e123,e0123".split(','),
   types : [
     { name : "scalar", layout : ["1"] },
-    { name : "vector", layout : ["e0", "e1", "e2", "e3"] },
+    { name : "study", layout : ["1", "e0123"] },
+    { name : "vector", layout : ["e1", "e2", "e3", "e0"] },
     { name : "bivector", layout : ["e23", "e31", "e12","e01", "e02", "e03"] },
-    { name : "trivector", layout : ["e021", "e013", "e032", "e123"] },
+    { name : "trivector", layout : ["e032", "e013", "e021", "e123"] },
     { name : "quadvector", layout : ["e0123"] },
-    { name : "rotor", layout : ["e23", "e31", "e12", "1", "e01", "e02", "e03", "e0123"] },
-    { name : "multivector", layout : "1,e01,e02,e03,e23,e31,e12,e021,e013,e032,e123,e0123,e0,e1,e2,e3".split(',') }
+    { name : "rotor", layout : ["1", "e23", "e31", "e12", "e01", "e02", "e03", "e0123"] },
+    { name : "multivector", layout : "1,e1,e2,e3,e0,e23,e31,e12,e01,e02,e03,e032,e013,e021,e123,e0123,".split(',') }
+  ]
 =#
