@@ -182,6 +182,7 @@ end
 
 
 #=
+# I wanted this to work but it doesn't handle the edge cases well enough and I don't know how to modify it to do so
 function motor_from_transform(M::SMatrix{4,4,T}) where {T<:Number}
     # thanks to Enki for this excellent labelled script & comments
     # https://enki.ws/ganja.js/examples/coffeeshop.html#8fjqnxTot
@@ -280,20 +281,11 @@ function motor_from_transform(M::SMatrix{4,4,T}) where {T<:Number}
         M[2, 1] M[2, 2] M[2, 3]
         M[3, 1] M[3, 2] M[3, 3]
     ]
-    rotq = normalize(motor_from_rotation(rot))
-
+    rotq = motor_from_rotation(rot)
     transpoint = Point3D(M[1, 4], M[2, 4], M[3, 4])
 
-    #unrotatedpt = transform(PGA3D.reverse(rotq), transpoint)
-    #unrotatedpt = transform(rotq, transpoint)
-    unrotatedpt = transpoint
-
-    transl = Motor3D(1, 0, 0, 0, -(1 // 2) * unrotatedpt[1], -(1 // 2) * unrotatedpt[2], -(1 // 2) * unrotatedpt[3], 0)
-    #transl = Motor3D(1, 0, 0, 0, -unrotatedpt[1], -unrotatedpt[2], -unrotatedpt[3], 0)
-    #transl = Motor3D(1, 0, 0, 0, -2 * unrotatedpt[1], -2 * unrotatedpt[2], -2 * unrotatedpt[3], 0)
-    #return normalize(rotq * transl)
+    transl = Motor3D(1, 0, 0, 0, -(1 // 2) * transpoint[1], -(1 // 2) * transpoint[2], -(1 // 2) * transpoint[3], 0)
     return normalize(transl * rotq)
-    #return rotq
 end
 #=
 void mat3_normalized_to_quat_fast(float q[4], const float mat[3][3])
