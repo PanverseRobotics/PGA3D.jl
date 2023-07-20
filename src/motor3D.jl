@@ -57,7 +57,7 @@ unitize(a::Motor3D) = Motor3D(internal_vec(a) .* (1 / weight_norm(a)))
 function LinearAlgebra.normalize(m::Motor3D)
     wnmsq = m[1] * m[1] + m[2] * m[2] + m[3] * m[3] + m[4] * m[4]
     if wnmsq ≈ 0 || wnmsq < 0
-        throw(DomainError(m, "Cannot normalize a motor with zero rotational part."))
+        throw(DomainError(m, "Motor3D must have a nonzero rotational part to normalize."))
     else
         wnm = sqrt(wnmsq)
         A = 1 / wnm
