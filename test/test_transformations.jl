@@ -131,9 +131,11 @@ using PGA3D, Test, SafeTestsets, Logging, PrettyPrinting, StaticArrays, Random
     @safetestset "Motor log and bivector exp" begin
         using PGA3D, Test, SafeTestsets, Logging, PrettyPrinting, StaticArrays, Random, LinearAlgebra
         Random.seed!(1)
+        atol = 1e-10
+        specialpath_atol = 1e-3
         motor_identity = identity_motor()
         special_motor_test_list = PGA3D.special_motors
-        for i in 1:1000
+        for i in 1:10000
             testmotorprenorm = if i <= length(special_motor_test_list)
                 special_motor_test_list[i]
             else
@@ -149,22 +151,12 @@ using PGA3D, Test, SafeTestsets, Logging, PrettyPrinting, StaticArrays, Random
                 continue
             end
 
-            #if testmotor[1] ≈ -1
-            #testmotor = -testmotor
-            #end
-
             @test testmotor * PGA3D.reverse(testmotor) ≈ motor_identity
 
             testbv = log(testmotor)
-
             testmotorexp = exp(testbv)
             @test testmotorexp * PGA3D.reverse(testmotorexp) ≈ motor_identity
-            #@info testmotor
-            #@info testbv
-            #@info testmotorexp
 
-            atol = 1e-10
-            specialpath_atol = 1e-3
             @test isapprox(testmotorexp, testmotor; atol=atol) || isapprox(testmotorexp, -testmotor; atol=atol) ||
                   (testmotorexp[2] == 0.0 && testmotorexp[3] == 0.0 && testmotorexp[4] == 0.0) && (isapprox(testmotorexp, testmotor; atol=specialpath_atol) || isapprox(testmotorexp, -testmotor; atol=specialpath_atol))
             if !(isapprox(testmotorexp, testmotor; atol=atol) || isapprox(testmotorexp, -testmotor; atol=atol) ||
@@ -180,9 +172,6 @@ using PGA3D, Test, SafeTestsets, Logging, PrettyPrinting, StaticArrays, Random
             testmotorexpha2 = normalize(testmotorexpha * testmotorexpha)
 
 
-            #@info "testmotor: $testmotor"
-            #@info "testmotorexpha: $testmotorexpha"
-            #@info "testmotorexpha2: $testmotorexpha2"
             @test isapprox(testmotorexpha2, testmotor; atol=atol) || isapprox(testmotorexpha2, -testmotor; atol=atol) ||
                   (testmotorexpha2[2] == 0.0 && testmotorexpha2[3] == 0.0 && testmotorexpha2[4] == 0.0) && (isapprox(testmotorexpha2, testmotor; atol=specialpath_atol) || isapprox(testmotorexpha2, -testmotor; atol=specialpath_atol))
 
@@ -191,34 +180,49 @@ using PGA3D, Test, SafeTestsets, Logging, PrettyPrinting, StaticArrays, Random
             testmotorexpthi3 = normalize(testmotorexpthi * testmotorexpthi * testmotorexpthi)
 
 
-            #@info "testmotor: $testmotor"
-            #@info "testmotorexpha: $testmotorexpha"
-            #@info "testmotorexpha2: $testmotorexpha2"
             @test isapprox(testmotorexpthi3, testmotor; atol=atol) || isapprox(testmotorexpthi3, -testmotor; atol=atol) ||
                   (testmotorexpthi3[2] == 0.0 && testmotorexpthi3[3] == 0.0 && testmotorexpthi3[4] == 0.0) && (isapprox(testmotorexpthi3, testmotor; atol=specialpath_atol) || isapprox(testmotorexpthi3, -testmotor; atol=specialpath_atol))
 
-            #testfrom2 = Point3D(randn(3)...)
-            #testto2 = Point3D(randn(3)...)
-            #testline2 = line_fromto(testfrom2, testto2)
-            #testangle2 = rand()
-            #testdisp2 = rand()
-            #testmotor2 = normalize(motor_screw(testline2, testangle2, testdisp2))
             testmotor2 = normalize(Motor3D(randn(8)...))
 
             testmotor21 = testmotor2 * PGA3D.reverse(testmotor)
             testmotor221 = testmotor21 * testmotor
 
-            #@info "testmotor2: $testmotor2"
-            #@info "testmotor221: $testmotor221"
             @test testmotor221 ≈ testmotor2 || testmotor221 ≈ -testmotor2
 
             testbv21 = log(testmotor21)
             testmotor212 = exp(testbv21)
             testmotor222 = testmotor212 * testmotor
 
-            #@info "testmotor2: $testmotor2"
-            #@info "testmotor222: $testmotor222"
             @test isapprox(testmotor222, testmotor2; atol=atol) || isapprox(testmotor222, -testmotor2; atol=atol)
+        end
+    end
+
+    @safetestset "Line exp and motor log" begin
+        using PGA3D, Test, SafeTestsets, Logging, PrettyPrinting, StaticArrays, Random, LinearAlgebra
+        Random.seed!(1)
+        atol = 1e-10
+        specialpath_atol = 1e-3
+        motor_identity = identity_motor()
+        special_line_test_list = PGA3D.special_lines
+        for i in 1:10_000
+            testline = if i <= length(special_line_test_list)
+                special_line_test_list[i]
+            else
+                # can't do gaussians here because if the rotation part is too big then !(log(exp(testline)) ≈ testline) 
+                rotvalue = rand(3) .- 0.5
+                transvalue = randn(3)
+                Line3D(rotvalue..., transvalue...)
+            end
+
+            testmotor = exp(testline)
+            testline2 = log(testmotor)
+            @test isapprox(testline2, testline; atol=atol)
+
+            testmotor2 = exp(testline2)
+            @test isapprox(testmotor2, testmotor; atol=atol) || isapprox(testmotor2, -testmotor; atol=atol) ||
+                  (testmotor2[2] == 0.0 && testmotor2[3] == 0.0 && testmotor2[4] == 0.0) && (isapprox(testmotor2, testmotor; atol=specialpath_atol) || isapprox(testmotor2, -testmotor; atol=specialpath_atol))
+
         end
     end
 end
