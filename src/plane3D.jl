@@ -28,7 +28,7 @@ Base.:(*)(a::Real, b::Plane3D) = Plane3D((a .* internal_vec(b)))
 function LinearAlgebra.normalize(p::Plane3D)
     direction_normsq = p[1] * p[1] + p[2] * p[2] + p[3] * p[3]
     if direction_normsq ≈ 0
-        throw(DomainError(p, "Plane3D must have a non-zero direction to normalize.")))
+        throw(DomainError(p, "Plane3D must have a non-zero direction to normalize."))
     else
         direction_inv_norm = 1 / sqrt(direction_normsq)
         return p * direction_inv_norm

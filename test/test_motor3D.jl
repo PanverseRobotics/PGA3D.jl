@@ -161,7 +161,7 @@ end
                 catch e
                     @test isa(e, DomainError)
                     @test isa(e.val, Motor3D)
-                    @test e.msg == "Cannot normalize a motor with zero rotational part."
+                    @test e.msg == "Motor3D must have a nonzero rotational part to normalize."
                 end
             else
                 testmotornormed = normalize(testmotor)
