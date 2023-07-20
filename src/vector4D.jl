@@ -25,13 +25,13 @@ Vector4D(el::AbstractPGA3DElement{T}) where {T<:Number} = Base.convert(Vector4D{
 
 # Define the basic arithmetic operations for Vector4D
 # I think this interface prevents broadcast fusion from happening but we can fix that later if we need the extra performance.
-Base.:(+)(a::Vector4D, b::Vector4D) = Vector4D((internal_vec(a) .+ internal_vec(b))...)
-Base.:(-)(a::Vector4D, b::Vector4D) = Vector4D((internal_vec(a) .- internal_vec(b))...)
+Base.:(+)(a::Vector4D, b::Vector4D) = Vector4D((internal_vec(a) .+ internal_vec(b)))
+Base.:(-)(a::Vector4D, b::Vector4D) = Vector4D((internal_vec(a) .- internal_vec(b)))
 LinearAlgebra.:(⋅)(a::Vector4D, b::Vector4D) = internal_vec(a) ⋅ internal_vec(b)
 #LinearAlgebra.dot(a::Vector4D, b::Vector4D) = a ⋅ b
 Base.:(-)(a::Vector4D) = Vector4D(-internal_vec(a))
-Base.:(*)(a::Vector4D, b::Real) = Vector4D((internal_vec(a) .* b)...)
-Base.:(*)(a::Real, b::Vector4D) = Vector4D((a .* internal_vec(b))...)
+Base.:(*)(a::Vector4D, b::Real) = Vector4D((internal_vec(a) .* b))
+Base.:(*)(a::Real, b::Vector4D) = Vector4D((a .* internal_vec(b)))
 
 #Vector4D(el::AbstractPGA3DElement{T}) where {T<:Real} = convert(Vector4D{T}, el)
 

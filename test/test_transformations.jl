@@ -187,8 +187,6 @@ using PGA3D, Test, SafeTestsets, Logging, PrettyPrinting, StaticArrays, Random
             #@info "testmotor2: $testmotor2"
             #@info "testmotor222: $testmotor222"
             @test isapprox(testmotor222, testmotor2; atol=atol) || isapprox(testmotor222, -testmotor2; atol=atol)
-
-
         end
     end
 end

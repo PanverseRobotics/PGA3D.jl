@@ -30,9 +30,9 @@ get_e013(p::Point3D) = p[2]
 get_e021(p::Point3D) = p[3]
 get_e123(p::Point3D) = p[4]
 
-Base.:(+)(a::Point3D, b::Point3D) = Point3D((internal_vec(a) .+ internal_vec(b))...)
-Base.:(-)(a::Point3D, b::Point3D) = Point3D((internal_vec(a) .- internal_vec(b))...)
+Base.:(+)(a::Point3D, b::Point3D) = Point3D((internal_vec(a) .+ internal_vec(b)))
+Base.:(-)(a::Point3D, b::Point3D) = Point3D((internal_vec(a) .- internal_vec(b)))
 Base.:(-)(a::Point3D) = Point3D(-internal_vec(a))
-Base.:(*)(a::Point3D, b::Real) = Point3D((internal_vec(a) .* b)...)
-Base.:(*)(a::Real, b::Point3D) = Point3D((a .* internal_vec(b))...)
+Base.:(*)(a::Point3D, b::Real) = Point3D((internal_vec(a) .* b))
+Base.:(*)(a::Real, b::Point3D) = Point3D((a .* internal_vec(b)))
 

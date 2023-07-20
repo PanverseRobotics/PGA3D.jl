@@ -82,6 +82,7 @@ function Base.sqrt(m::Motor3D)
     normalize(Motor3D(1 + m[1], m[2], m[3], m[4], m[5], m[6], m[7], m[8]))
 end
 
+#=
 function get_position(a_ununitized::Motor3D)
     a = unitize(a_ununitized)
     A14 = a[2] * a[7] - a[3] * a[6]
@@ -94,6 +95,7 @@ function get_position(a_ununitized::Motor3D)
 
     return Point3D((A14 + B14) * 2, (A24 + B24) * 2, (A34 + B34) * 2)
 end
+=#
 
 #=
 function get_transform_matrix(m_unnormalized::Motor3D)

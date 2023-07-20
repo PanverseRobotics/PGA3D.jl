@@ -16,6 +16,9 @@ fulltestset = @testset "PGA3D.jl" begin
     @safetestset "line3D.jl" begin
         include("test_line3D.jl")
     end
+    @safetestset "plane3D.jl" begin
+        include("test_plane3D.jl")
+    end
     @safetestset "motor3D.jl" begin
         include("test_motor3D.jl")
     end
