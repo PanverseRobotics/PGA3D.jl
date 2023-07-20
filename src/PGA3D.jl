@@ -51,7 +51,6 @@ export Motor3D
 export identity_motor, motor_fromto, transform, motor_screw, motor_translation
 export get_transform_matrix, get_inv_transform_matrix, get_transform_and_inv_matrices
 export get_position, motor_from_transform
-export line_exp, motor_log
 
 export bulk_norm, weight_norm, unitize
 export dual, undual
