@@ -145,16 +145,16 @@ using PGA3D, Test, SafeTestsets, Logging, PrettyPrinting, StaticArrays, Random
             atol = 1e-10
             specialpath_atol = 1e-3
             @test isapprox(testmotorexp, testmotor; atol=atol) || isapprox(testmotorexp, -testmotor; atol=atol) ||
-                  (testmotorexp[1] == 0.0 && testmotorexp[2] == 0.0 && testmotorexp[3] == 0.0) && (isapprox(testmotorexp, testmotor; atol=specialpath_atol) || isapprox(testmotorexp, -testmotor; atol=specialpath_atol))
+                  (testmotorexp[2] == 0.0 && testmotorexp[3] == 0.0 && testmotorexp[4] == 0.0) && (isapprox(testmotorexp, testmotor; atol=specialpath_atol) || isapprox(testmotorexp, -testmotor; atol=specialpath_atol))
             if !(isapprox(testmotorexp, testmotor; atol=atol) || isapprox(testmotorexp, -testmotor; atol=atol) ||
-                 (testmotorexp[1] == 0.0 && testmotorexp[2] == 0.0 && testmotorexp[3] == 0.0) && (isapprox(testmotorexp, testmotor; atol=specialpath_atol) || isapprox(testmotorexp, -testmotor; atol=specialpath_atol))
+                 (testmotorexp[2] == 0.0 && testmotorexp[3] == 0.0 && testmotorexp[4] == 0.0) && (isapprox(testmotorexp, testmotor; atol=specialpath_atol) || isapprox(testmotorexp, -testmotor; atol=specialpath_atol))
             )
                 @info testmotor
                 @info testbv
                 @info testmotorexp
             end
 
-            testbvha = testbv * 0.5
+            testbvha = testbv * (1 / 2)
             testmotorexpha = normalize(exp(testbvha))
             testmotorexpha2 = normalize(testmotorexpha * testmotorexpha)
 
@@ -163,7 +163,18 @@ using PGA3D, Test, SafeTestsets, Logging, PrettyPrinting, StaticArrays, Random
             #@info "testmotorexpha: $testmotorexpha"
             #@info "testmotorexpha2: $testmotorexpha2"
             @test isapprox(testmotorexpha2, testmotor; atol=atol) || isapprox(testmotorexpha2, -testmotor; atol=atol) ||
-                  (testmotorexpha2[1] == 0.0 && testmotorexpha2[2] == 0.0 && testmotorexpha2[3] == 0.0) && (isapprox(testmotorexpha2, testmotor; atol=specialpath_atol) || isapprox(testmotorexpha2, -testmotor; atol=specialpath_atol))
+                  (testmotorexpha2[2] == 0.0 && testmotorexpha2[3] == 0.0 && testmotorexpha2[4] == 0.0) && (isapprox(testmotorexpha2, testmotor; atol=specialpath_atol) || isapprox(testmotorexpha2, -testmotor; atol=specialpath_atol))
+
+            testbvthi = testbv * (1 / 3)
+            testmotorexpthi = normalize(exp(testbvthi))
+            testmotorexpthi3 = normalize(testmotorexpthi * testmotorexpthi * testmotorexpthi)
+
+
+            #@info "testmotor: $testmotor"
+            #@info "testmotorexpha: $testmotorexpha"
+            #@info "testmotorexpha2: $testmotorexpha2"
+            @test isapprox(testmotorexpthi3, testmotor; atol=atol) || isapprox(testmotorexpthi3, -testmotor; atol=atol) ||
+                  (testmotorexpthi3[2] == 0.0 && testmotorexpthi3[3] == 0.0 && testmotorexpthi3[4] == 0.0) && (isapprox(testmotorexpthi3, testmotor; atol=specialpath_atol) || isapprox(testmotorexpthi3, -testmotor; atol=specialpath_atol))
 
             #testfrom2 = Point3D(randn(3)...)
             #testto2 = Point3D(randn(3)...)

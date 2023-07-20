@@ -22,6 +22,9 @@ fulltestset = @testset "PGA3D.jl" begin
     @safetestset "motor3D.jl" begin
         include("test_motor3D.jl")
     end
+    @safetestset "regressive_product.jl and outer_product.jl" begin
+        include("test_regressive_outer_products.jl")
+    end
     @safetestset "conversions.jl" begin
         include("test_conversions.jl")
     end

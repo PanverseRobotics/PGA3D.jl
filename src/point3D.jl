@@ -36,3 +36,5 @@ Base.:(-)(a::Point3D) = Point3D(-internal_vec(a))
 Base.:(*)(a::Point3D, b::Real) = Point3D((internal_vec(a) .* b))
 Base.:(*)(a::Real, b::Point3D) = Point3D((a .* internal_vec(b)))
 
+LinearAlgebra.normalize(p::Point3D) = Point3D(p[1] / p[4], p[2] / p[4], p[3] / p[4])
+
