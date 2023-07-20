@@ -15,6 +15,7 @@ include("conversions.jl")
 include("dual.jl")
 include("outer_product.jl")
 include("regressive_product.jl")
+include("geometric_product.jl")
 include("element_construction.jl")
 include("transformations.jl")
 

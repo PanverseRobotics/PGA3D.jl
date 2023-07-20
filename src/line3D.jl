@@ -67,3 +67,38 @@ function LinearAlgebra.normalize(a::Line3D)
     end
 end
 
+function Base.inv(a::Line3D)
+    a1a1 = a[1] * a[1]
+    a2a2 = a[2] * a[2]
+    a3a3 = a[3] * a[3]
+    D1 = a1a1 + a2a2 + a3a3
+    if D1 ≈ 0
+        throw(DomainError(a, "Line3D must have a non-zero direction to invert."))
+    else
+        a1a1a1 = a1a1 * a[1]
+        a2a2a2 = a2a2 * a[2]
+        a3a3a3 = a3a3 * a[3]
+        a1a1a1a1 = a1a1a1 * a[1]
+        a2a2a2a2 = a2a2a2 * a[2]
+        a3a3a3a3 = a3a3a3 * a[3]
+        a2a5 = a[2] * a[5]
+        a3a6 = a[3] * a[6]
+        a1a4 = a[1] * a[4]
+        a2a2a2a5 = a2a2a2 * a[5]
+        a3a3a3a6 = a3a3a3 * a[6]
+        a2a2a3a3 = a2a2 * a3a3
+        a1a1a1a4 = a1a1a1 * a[4]
+        a1a1a1a1a1 = a1a1a1a1 * a[1]
+        a2a2a2a2a2 = a2a2a2a2 * a[2]
+        a3a3a3a3a3 = a3a3a3a3 * a[3]
+        D2 = a1a1a1a1a1 * a[1] + 3 * a1a1a1a1 * a2a2 + 3 * a1a1a1a1 * a3a3 + 3 * a1a1 * a2a2a2a2 + 6 * a1a1 * a2a2a3a3 + 3 * a1a1 * a3a3a3a3 + a2a2a2a2a2 * a[2] + 3 * a2a2a2a2 * a3a3 + 3 * a2a2 * a3a3a3a3 + a3a3a3a3a3 * a[3]
+        return Line3D((-a[1]) / (D1),
+            (-a[2]) / (D1),
+            (-a[3]) / (D1),
+            (a1a1a1a1 * a[4] - a2a2a2a2 * a[4] - a3a3a3a3 * a[4] + 2 * (a1a1a1 * a2a5 + a1a1a1 * a3a6 + a[1] * a2a2a2a5 + a[1] * a2a2 * a3a6 + a[1] * a2a5 * a3a3 + a[1] * a3a3a3a6 - a2a2a3a3 * a[4])) / (D2),
+            (-a1a1a1a1 * a[5] + a2a2a2a2 * a[5] - a3a3a3a3 * a[5] + 2 * (a1a1a1a4 * a[2] + a1a1 * a[2] * a3a6 - a1a1 * a3a3 * a[5] + a1a4 * a2a2a2 + a1a4 * a[2] * a3a3 + a2a2a2 * a3a6 + a[2] * a3a3a3a6)) / (D2),
+            (-a1a1a1a1 * a[6] - a2a2a2a2 * a[6] + a3a3a3a3 * a[6] + 2 * (a1a1a1a4 * a[3] - a1a1 * a2a2 * a[6] + a1a1 * a2a5 * a[3] + a1a4 * a2a2 * a[3] + a1a4 * a3a3a3 + a2a2a2a5 * a[3] + a2a5 * a3a3a3)) / (D2))
+    end
+end
+
+

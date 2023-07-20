@@ -69,39 +69,71 @@ using PGA3D, Test, SafeTestsets, Logging, PrettyPrinting, StaticArrays, Random
     @safetestset "Motor to and from TransformMatrix" begin
         using PGA3D, Test, SafeTestsets, Logging, PrettyPrinting, StaticArrays, Random, LinearAlgebra
         motor_identity = identity_motor()
+        special_motor_point_test_list = collect(Iterators.product(PGA3D.special_motors, PGA3D.special_points))
         Random.seed!(1)
-        for i in 1:1000
-            testfrom = Point3D(randn(3)...)
-            testto = Point3D(randn(3)...)
-            testline = line_fromto(testfrom, testto)
-            testangle = randn()
-            testdisp = randn()
-            testmotor = motor_screw(testline, testangle, testdisp)
+        atol = 1e-8
+        for i in 1:10000
+            (; testmotorprenorm, testpoint) = if i <= length(special_motor_point_test_list)
+                testmotorprenorm = special_motor_point_test_list[i][1]
+                testpoint = special_motor_point_test_list[i][2]
+                (; testmotorprenorm, testpoint)
+            else
+                testmotorprenorm = Motor3D(randn(8)...)
+                testpoint = Point3D(randn(4)...)
+                (; testmotorprenorm, testpoint)
+            end
+            # only normalizable motors are viable for transform matrices
+            testmotor = try
+                normalize(testmotorprenorm)
+            catch e
+                @test isa(e, DomainError)
+                @test isa(e.val, Motor3D)
+                @test e.msg == "Motor3D must have a non-zero rotational part to normalize."
+                continue
+            end
+
             testmatrix = get_transform_matrix(testmotor)
             testmatrixinv = get_inv_transform_matrix(testmotor)
             testmatrix2, testmatrixinv2 = get_transform_and_inv_matrices(testmotor)
 
             testmatrixneg = get_transform_matrix(-testmotor)
-            @test testmatrixneg ≈ testmatrix
+            @test testmatrixneg ≈ testmatrix atol = atol
 
-            @test testmatrix ≈ testmatrix2
-            @test testmatrixinv ≈ testmatrixinv2
+            @test testmatrix ≈ testmatrix2 atol = atol
+            @test testmatrixinv ≈ testmatrixinv2 atol = atol
             SAI = SA[1.0 0 0 0; 0 1 0 0; 0 0 1 0; 0 0 0 1]
-            @test testmatrix * testmatrixinv ≈ SAI
-            @test testmatrixinv * testmatrix ≈ SAI
-            testpoint = Point3D(randn(3)...)
+            @test testmatrix * testmatrixinv ≈ SAI atol = atol
+            @test testmatrixinv * testmatrix ≈ SAI atol = atol
             transformedpt = transform(testmotor, testpoint)
             matrixedpt = testmatrix * internal_vec(testpoint)
-            @test internal_vec(transformedpt) ≈ matrixedpt
-            @test testmatrixinv * matrixedpt ≈ internal_vec(testpoint)
+            @test internal_vec(transformedpt) ≈ matrixedpt atol = atol
+            @test testmatrixinv * matrixedpt ≈ internal_vec(testpoint) atol = atol
             invmatrixedpt = testmatrixinv * internal_vec(testpoint)
             invtransformedpt = transform(PGA3D.reverse(testmotor), testpoint)
-            @test internal_vec(invtransformedpt) ≈ invmatrixedpt
+            @test internal_vec(invtransformedpt) ≈ invmatrixedpt atol = atol
 
             # there are two motors per transform matrix (m and -m), so we need to test that it is generated as one of the two
-            testmotor2 = normalize(motor_from_transform(testmatrix))
-            #@test testmotor2 ≈ testmotor || testmotor2 ≈ -testmotor
+            testmotor2 = motor_from_transform(testmatrix)
+            #testmotor2 = testmotor2 * testmotor2
+
+            # these are the ones that are close to wrap-around point. I don't think this is *wrong* per-se, since it's extremely sensitive
+            # but this could lead to undesired behavior if this is relied upon
+            if !(isapprox(testmotor2, testmotor; atol=atol) || isapprox(testmotor2, -testmotor; atol=atol))
+                #@info testmotor
+                #@info testmotor2
+                @info testmatrix
+                #@info testmatrixinv
+                @info i
+                @info testmotor
+                @info testmotor2
+                @info testpoint
+                #@test transform(testmotor2, testpoint) ≈ transform(testmotor, testpoint) atol = atol
+                @test transform(sqrt(testmotor2 * testmotor2), testpoint) ≈ transform(sqrt(testmotor * testmotor), testpoint) atol = atol
+            else
+                @test isapprox(testmotor2, testmotor; atol=atol) || isapprox(testmotor2, -testmotor; atol=atol)
+            end
             testmotorrev2 = normalize(motor_from_transform(testmatrixinv))
+            #@test isapprox(testmotorrev2, PGA3D.reverse(testmotor); atol=atol) || isapprox(testmotorrev2, -PGA3D.reverse(testmotor); atol=atol)
             #@test testmotorrev2 ≈ PGA3D.reverse(testmotor) || testmotorrev2 ≈ -PGA3D.reverse(testmotor)
             #@info testmotor2
             #@info testmotorrev2

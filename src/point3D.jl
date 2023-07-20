@@ -69,12 +69,3 @@ function Base.inv(a::Point3D)
 
 end
 
-function Base.:(*)(a::Point3D, b::Point3D)
-    return Motor3D(-a[4] * b[4],
-        0, 0, 0,
-        a[1] * b[4] - a[4] * b[1],
-        a[2] * b[4] - a[4] * b[2],
-        a[3] * b[4] - a[4] * b[3],
-        0)
-end
-
