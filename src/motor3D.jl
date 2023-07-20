@@ -212,7 +212,7 @@ end
 =#
 
 function motor_from_rotation(M::SMatrix{3,3,T}) where {T<:Number}
-    #M = M'
+    # from https://math.stackexchange.com/questions/893984/conversion-of-rotation-matrix-to-quaternion/3183435#3183435
     if M[3, 3] < 0
         if M[1, 1] > M[2, 2]
             trace = 1 + M[1, 1] - M[2, 2] - M[3, 3]
@@ -281,153 +281,13 @@ function motor_from_transform(M::SMatrix{4,4,T}) where {T<:Number}
         M[2, 1] M[2, 2] M[2, 3]
         M[3, 1] M[3, 2] M[3, 3]
     ]
-    rotq = motor_from_rotation(rot)
+    rotor = motor_from_rotation(rot)
     transpoint = Point3D(M[1, 4], M[2, 4], M[3, 4])
 
-    transl = Motor3D(1, 0, 0, 0, -(1 // 2) * transpoint[1], -(1 // 2) * transpoint[2], -(1 // 2) * transpoint[3], 0)
-    return normalize(transl * rotq)
+    translator = Motor3D(1, 0, 0, 0, -(1 // 2) * transpoint[1], -(1 // 2) * transpoint[2], -(1 // 2) * transpoint[3], 0)
+    return normalize(translator * rotor)
 end
-#=
-void mat3_normalized_to_quat_fast(float q[4], const float mat[3][3])
-{
-  BLI_ASSERT_UNIT_M3(mat);
-  /* Caller must ensure matrices aren't negative for valid results, see: T24291, T94231. */
-  BLI_assert(!is_negative_m3(mat));
-
-  /* Method outlined by Mike Day, ref: https://math.stackexchange.com/a/3183435/220949
-   * with an additional `sqrtf(..)` for higher precision result.
-   * Removing the `sqrt` causes tests to fail unless the precision is set to 1e-6 or larger. */
-
-  if (mat[2][2] < 0.0f) {
-    if (mat[0][0] > mat[1][1]) {
-      const float trace = 1.0f + mat[0][0] - mat[1][1] - mat[2][2];
-      float s = 2.0f * sqrtf(trace);
-      if (mat[1][2] < mat[2][1]) {
-        /* Ensure W is non-negative for a canonical result. */
-        s = -s;
-      }
-      q[1] = 0.25f * s;
-      s = 1.0f / s;
-      q[0] = (mat[1][2] - mat[2][1]) * s;
-      q[2] = (mat[0][1] + mat[1][0]) * s;
-      q[3] = (mat[2][0] + mat[0][2]) * s;
-      if (UNLIKELY((trace == 1.0f) && (q[0] == 0.0f && q[2] == 0.0f && q[3] == 0.0f))) {
-        /* Avoids the need to normalize the degenerate case. */
-        q[1] = 1.0f;
-      }
-    }
-    else {
-      const float trace = 1.0f - mat[0][0] + mat[1][1] - mat[2][2];
-      float s = 2.0f * sqrtf(trace);
-      if (mat[2][0] < mat[0][2]) {
-        /* Ensure W is non-negative for a canonical result. */
-        s = -s;
-      }
-      q[2] = 0.25f * s;
-      s = 1.0f / s;
-      q[0] = (mat[2][0] - mat[0][2]) * s;
-      q[1] = (mat[0][1] + mat[1][0]) * s;
-      q[3] = (mat[1][2] + mat[2][1]) * s;
-      if (UNLIKELY((trace == 1.0f) && (q[0] == 0.0f && q[1] == 0.0f && q[3] == 0.0f))) {
-        /* Avoids the need to normalize the degenerate case. */
-        q[2] = 1.0f;
-      }
-    }
-  }
-  else {
-    if (mat[0][0] < -mat[1][1]) {
-      const float trace = 1.0f - mat[0][0] - mat[1][1] + mat[2][2];
-      float s = 2.0f * sqrtf(trace);
-      if (mat[0][1] < mat[1][0]) {
-        /* Ensure W is non-negative for a canonical result. */
-        s = -s;
-      }
-      q[3] = 0.25f * s;
-      s = 1.0f / s;
-      q[0] = (mat[0][1] - mat[1][0]) * s;
-      q[1] = (mat[2][0] + mat[0][2]) * s;
-      q[2] = (mat[1][2] + mat[2][1]) * s;
-      if (UNLIKELY((trace == 1.0f) && (q[0] == 0.0f && q[1] == 0.0f && q[2] == 0.0f))) {
-        /* Avoids the need to normalize the degenerate case. */
-        q[3] = 1.0f;
-      }
-    }
-    else {
-      /* NOTE(@campbellbarton): A zero matrix will fall through to this block,
-       * needed so a zero scaled matrices to return a quaternion without rotation, see: T101848. */
-      const float trace = 1.0f + mat[0][0] + mat[1][1] + mat[2][2];
-      float s = 2.0f * sqrtf(trace);
-      q[0] = 0.25f * s;
-      s = 1.0f / s;
-      q[1] = (mat[1][2] - mat[2][1]) * s;
-      q[2] = (mat[2][0] - mat[0][2]) * s;
-      q[3] = (mat[0][1] - mat[1][0]) * s;
-      if (UNLIKELY((trace == 1.0f) && (q[1] == 0.0f && q[2] == 0.0f && q[3] == 0.0f))) {
-        /* Avoids the need to normalize the degenerate case. */
-        q[0] = 1.0f;
-      }
-    }
-    =#
 
 
-#=
-function motor_from_transform(M::SMatrix{4,4,T}) where {T<:Number}
-    # rotation stuff first
-    M11 = M[1, 1]
-    M22 = M[2, 2]
-    M33 = M[3, 3]
-    sum = M11 + M22 + M33
-
-    (; vx, vy, vz, vw) = if sum > 0
-        vw = sqrt(sum + 1) * (1 // 2)
-        f = (1 // 4) / vw
-
-        vx = (M[3, 2] - M[2, 3]) * f
-        vy = (M[1, 3] - M[3, 1]) * f
-        vz = (M[2, 1] - M[1, 2]) * f
-
-        (; vx, vy, vz, vw)
-    elseif M11 > M22 && M11 > M33
-        vx = sqrt(M11 - M22 - M33 + 1) * (1 // 2)
-        f = (1 // 4) / vx
-
-        vy = (M[2, 1] + M[1, 2]) * f
-        vz = (M[1, 3] + M[3, 1]) * f
-        vw = (M[3, 2] - M[2, 3]) * f
-
-        (; vx, vy, vz, vw)
-    elseif M22 > M33
-        vy = sqrt(M22 - M33 - M11 + 1) * (1 // 2)
-        f = (1 // 4) / vy
-
-        vx = (M[2, 1] + M[1, 2]) * f
-        vz = (M[3, 2] + M[2, 3]) * f
-        vw = (M[1, 3] - M[3, 1]) * f
-
-        (; vx, vy, vz, vw)
-    else
-        vz = sqrt(M33 - M11 - M22 + 1) * (1 // 2)
-        f = (1 // 4) / vz
-
-        vx = (M[1, 3] + M[3, 1]) * f
-        vy = (M[3, 2] + M[2, 3]) * f
-        vw = (M[2, 1] - M[1, 2]) * f
-
-        (; vx, vy, vz, vw)
-    end
-
-    # ok so now we have the rotational part, let's do the translational part
-    tx = M[1, 4] * (1 // 2)
-    ty = M[2, 4] * (1 // 2)
-    tz = M[3, 4] * (1 // 2)
-
-    mx = vw * tx + vz * ty - vy * tz
-    my = vw * ty + vx * tz - vz * tx
-    mz = vw * tz + vy * tx - vx * ty
-    mw = -vx * tx - vy * ty - vz * tz
-
-    unitize(Motor3D(vx, vy, vz, vw, mx, my, mz, mw))
-end
-=#
 
 

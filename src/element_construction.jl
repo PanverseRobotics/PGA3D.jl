@@ -23,7 +23,6 @@ end
 
 function Base.log(m::Motor3D)
     # https://arxiv.org/abs/2206.07496 section 8.2
-    #m = unitize(m_ununitized)
     if m[1] ≈ 1
         return Line3D(0, 0, 0, m[5], m[6], m[7])
     elseif m[1] ≈ -1
