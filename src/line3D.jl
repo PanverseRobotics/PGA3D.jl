@@ -24,6 +24,16 @@ get_e01(a::Line3D) = a[4]
 get_e02(a::Line3D) = a[5]
 get_e03(a::Line3D) = a[6]
 
+const special_lines = SA[
+    Line3D(0, 0, 0, 0, 0, 0),
+    Line3D(1, 0, 0, 0, 0, 0), Line3D(-1, 0, 0, 0, 0, 0),
+    Line3D(0, 1, 0, 0, 0, 0), Line3D(0, -1, 0, 0, 0, 0),
+    Line3D(0, 0, 1, 0, 0, 0), Line3D(0, 0, -1, 0, 0, 0),
+    Line3D(0, 0, 0, 1, 0, 0), Line3D(0, 0, 0, -1, 0, 0),
+    Line3D(0, 0, 0, 0, 1, 0), Line3D(0, 0, 0, 0, -1, 0),
+    Line3D(0, 0, 0, 0, 0, 1), Line3D(0, 0, 0, 0, 0, -1)
+]
+
 line_vector(a::Line3D) = SA[a[1], a[2], a[3]]
 line_moment(a::Line3D) = SA[a[4], a[5], a[6]]
 

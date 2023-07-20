@@ -24,6 +24,16 @@ end
 
 internal_vec(p::Point3D) = p.vec
 
+const special_points = SA[
+    Point3D(0, 0, 0, 0),
+    Point3D(1, 0, 0, 0), Point3D(-1, 0, 0, 0),
+    Point3D(0, 1, 0, 0), Point3D(0, -1, 0, 0),
+    Point3D(0, 0, 1, 0), Point3D(0, 0, -1, 0),
+    Point3D(0, 0, 0, 1), Point3D(0, 0, 0, -1),
+    Point3D(1, 0, 0, 1), Point3D(-1, 0, 0, 1),
+    Point3D(0, 1, 0, 1), Point3D(0, -1, 0, 1),
+    Point3D(0, 0, 1, 1), Point3D(0, 0, -1, 1)
+]
 
 get_e032(p::Point3D) = p[1]
 get_e013(p::Point3D) = p[2]
@@ -42,5 +52,29 @@ function LinearAlgebra.normalize(p::Point3D)
     else
         return Point3D(p[1] / p[4], p[2] / p[4], p[3] / p[4])
     end
+end
+
+function Base.inv(a::Point3D)
+    D2 = a[4]
+    if D2 ≈ 0
+        throw(DomainError(a, "Point3D must not be at infinity to invert."))
+    else
+        D1 = a[4] * a[4]
+        return Point3D(
+            (-a[1]) / (D1),
+            (-a[2]) / (D1),
+            (-a[3]) / (D1),
+            (-1) / (D2))
+    end
+
+end
+
+function Base.:(*)(a::Point3D, b::Point3D)
+    return Motor3D(-a[4] * b[4],
+        0, 0, 0,
+        a[1] * b[4] - a[4] * b[1],
+        a[2] * b[4] - a[4] * b[2],
+        a[3] * b[4] - a[4] * b[3],
+        0)
 end
 

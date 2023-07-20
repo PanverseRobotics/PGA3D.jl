@@ -1,11 +1,10 @@
-using SafeTestsets, Test, Logging
+using PGA3D, Test, SafeTestsets, Logging, StaticArrays, Random, LinearAlgebra, IterTools
 
 @safetestset "Constructor" begin
-    using Test, SafeTestsets, Logging
+    using PGA3D, Test, SafeTestsets, Logging, StaticArrays, Random, LinearAlgebra, IterTools
 
     @safetestset "Default Constructor" begin
-        using PGA3D
-        using Test, SafeTestsets, Logging, StaticArrays
+        using PGA3D, Test, SafeTestsets, Logging, StaticArrays, Random, LinearAlgebra, IterTools
 
         @testset "Motor Int" begin
             testmotor = Motor3D(1, 2, 3, 4, 5, 6, 7, 8)
@@ -89,61 +88,15 @@ using SafeTestsets, Test, Logging
 end
 
 @safetestset "Operations" begin
-    using PGA3D, Test, SafeTestsets, Logging, StaticArrays, Random, LinearAlgebra
-    @safetestset "Multiplication" begin
-        using PGA3D, Test, SafeTestsets, Logging, StaticArrays, Random, LinearAlgebra
-        @safetestset "Motor Identity" begin
-            using PGA3D, Test, SafeTestsets, Logging, StaticArrays, Random, LinearAlgebra
-            motoridentity = identity_motor()
-            Random.seed!(1)
-            for i in 1:100
-                testmotor = Motor3D(randn(8)...)
+    using PGA3D, Test, SafeTestsets, Logging, StaticArrays, Random, LinearAlgebra, IterTools
 
-                @test testmotor * motoridentity ≈ testmotor
-                @test motoridentity * testmotor ≈ testmotor
-            end
-        end
-
-        @safetestset "Compare to transform matrix" begin
-            using PGA3D, Test, SafeTestsets, Logging, StaticArrays, Random, LinearAlgebra
-            motoridentity = identity_motor()
-            Random.seed!(1)
-            for i in 1:1000
-                (; testmotor, testmotor2) = try
-                    testmotor = normalize(Motor3D(randn(8)...))
-                    testmotor2 = normalize(Motor3D(randn(8)...))
-
-                    (; testmotor, testmotor2)
-                catch e
-                    @test isa(e, DomainError)
-                    @test isa(e.val, Motor3D)
-                    @test e.msg == "Motor3D must have a non-zero rotational part to normalize."
-                    continue
-                end
-
-                testmatrix, testmatrixinv = get_transform_and_inv_matrices(testmotor)
-                testmatrix2, testmatrixinv2 = get_transform_and_inv_matrices(testmotor2)
-
-                # test that matrix multiplication and inversion are the same as motor multiplication and reversion, respectively
-                @test testmatrix * testmatrix2 ≈ get_transform_matrix(testmotor * testmotor2)
-                @test testmatrix * testmatrixinv2 ≈ get_transform_matrix(testmotor * PGA3D.reverse(testmotor2))
-                @test testmatrixinv * testmatrix2 ≈ get_transform_matrix(PGA3D.reverse(testmotor) * testmotor2)
-                @test testmatrixinv * testmatrixinv2 ≈ get_transform_matrix(PGA3D.reverse(testmotor) * PGA3D.reverse(testmotor2))
-
-                # test that motor reverse is motor inverse for unitized motors
-                @test motoridentity ≈ testmotor * PGA3D.reverse(testmotor)
-                @test motoridentity ≈ PGA3D.reverse(testmotor) * testmotor
-
-
-            end
-        end
-    end
     @safetestset "Normalization" begin
-        using PGA3D, Test, SafeTestsets, Logging, StaticArrays, Random, LinearAlgebra
+        using PGA3D, Test, SafeTestsets, Logging, StaticArrays, Random, LinearAlgebra, IterTools
         Random.seed!(1)
+        special_motor_test_list = PGA3D.special_motors
         for i in 1:1000
-            testmotor = if i == 1
-                Motor3D(zeros(Float64, 8)...)
+            testmotor = if i <= length(special_motor_test_list)
+                special_motor_test_list[i]
             else
                 Motor3D(randn(8)...)
             end
@@ -178,5 +131,95 @@ end
             end
         end
 
+    end
+
+    @safetestset "Multiplication" begin
+        using PGA3D, Test, SafeTestsets, Logging, StaticArrays, Random, LinearAlgebra, IterTools
+        @safetestset "Motor Identity" begin
+            using PGA3D, Test, SafeTestsets, Logging, StaticArrays, Random, LinearAlgebra, IterTools
+            motoridentity = identity_motor()
+            special_motor_test_list = PGA3D.special_motors
+            Random.seed!(1)
+            for i in 1:1000
+                testmotor = if i <= length(special_motor_test_list)
+                    special_motor_test_list[i]
+                else
+                    Motor3D(randn(8)...)
+                end
+
+                @test testmotor * motoridentity ≈ testmotor
+                @test motoridentity * testmotor ≈ testmotor
+            end
+        end
+
+        @safetestset "Motor Sqrt" begin
+            using PGA3D, Test, SafeTestsets, Logging, StaticArrays, Random, LinearAlgebra, IterTools
+            special_motor_test_list = PGA3D.special_motors
+            Random.seed!(1)
+            atol = 1e-10
+            for i in 1:1000
+                testmotor = if i <= length(special_motor_test_list)
+                    special_motor_test_list[i]
+                else
+                    Motor3D(randn(8)...)
+                end
+                tmwn = testmotor[1:4] ⋅ testmotor[1:4]
+                if tmwn ≈ 0 || tmwn < 0
+                    try
+                        normalize(testmotor)
+                    catch e
+                        @test isa(e, DomainError)
+                        @test isa(e.val, Motor3D)
+                        @test e.msg == "Motor3D must have a non-zero rotational part to normalize."
+                    end
+                else
+                    testmotor = normalize(testmotor)
+                    testmotorsqrt = sqrt(testmotor)
+                    @test isapprox(testmotorsqrt * testmotorsqrt, testmotor; atol=atol) || isapprox(testmotorsqrt * testmotorsqrt, -testmotor; atol=atol)
+                end
+            end
+        end
+
+        @safetestset "Compare to transform matrix" begin
+            using PGA3D, Test, SafeTestsets, Logging, StaticArrays, Random, LinearAlgebra, IterTools
+            motoridentity = identity_motor()
+            special_motor_test_list = collect(Iterators.product(PGA3D.special_motors, PGA3D.special_motors))
+            Random.seed!(1)
+            for i in 1:1000
+                (; testmotorprenorm, testmotorprenorm2) = if i <= length(special_motor_test_list)
+                    testmotorprenorm = special_motor_test_list[i][1]
+                    testmotorprenorm2 = special_motor_test_list[i][2]
+                    (; testmotorprenorm, testmotorprenorm2)
+                else
+                    testmotorprenorm = Motor3D(randn(8)...)
+                    testmotorprenorm2 = Motor3D(randn(8)...)
+                    (; testmotorprenorm, testmotorprenorm2)
+                end
+
+                (; testmotor, testmotor2) = try
+                    testmotor = normalize(testmotorprenorm)
+                    testmotor2 = normalize(testmotorprenorm2)
+                    (; testmotor, testmotor2)
+                catch e
+                    @test isa(e, DomainError)
+                    @test isa(e.val, Motor3D)
+                    @test e.msg == "Motor3D must have a non-zero rotational part to normalize."
+                    continue
+                end
+
+                testmatrix, testmatrixinv = get_transform_and_inv_matrices(testmotor)
+                testmatrix2, testmatrixinv2 = get_transform_and_inv_matrices(testmotor2)
+
+                # test that matrix multiplication and inversion are the same as motor multiplication and reversion, respectively
+                @test testmatrix * testmatrix2 ≈ get_transform_matrix(testmotor * testmotor2)
+                @test testmatrix * testmatrixinv2 ≈ get_transform_matrix(testmotor * PGA3D.reverse(testmotor2))
+                @test testmatrixinv * testmatrix2 ≈ get_transform_matrix(PGA3D.reverse(testmotor) * testmotor2)
+                @test testmatrixinv * testmatrixinv2 ≈ get_transform_matrix(PGA3D.reverse(testmotor) * PGA3D.reverse(testmotor2))
+
+                # test that motor reverse is motor inverse for unitized motors
+                @test motoridentity ≈ testmotor * PGA3D.reverse(testmotor)
+                @test motoridentity ≈ PGA3D.reverse(testmotor) * testmotor
+            end
+        end
     end
 end

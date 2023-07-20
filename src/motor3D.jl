@@ -49,6 +49,26 @@ end
 
 identity_motor() = Motor3D(1, 0, 0, 0, 0, 0, 0, 0)
 
+const special_motors = SA[
+    Motor3D(0, 0, 0, 0, 0, 0, 0, 0),
+    identity_motor(), -identity_motor(),
+    Motor3D(0, 1, 0, 0, 0, 0, 0, 0), Motor3D(0, -1, 0, 0, 0, 0, 0, 0),
+    Motor3D(0, 0, 1, 0, 0, 0, 0, 0), Motor3D(0, 0, -1, 0, 0, 0, 0, 0),
+    Motor3D(0, 0, 0, 1, 0, 0, 0, 0), Motor3D(0, 0, 0, -1, 0, 0, 0, 0),
+    Motor3D(0, 0, 0, 0, 1, 0, 0, 0), Motor3D(0, 0, 0, 0, -1, 0, 0, 0),
+    Motor3D(0, 0, 0, 0, 0, 1, 0, 0), Motor3D(0, 0, 0, 0, 0, -1, 0, 0),
+    Motor3D(0, 0, 0, 0, 0, 0, 1, 0), Motor3D(0, 0, 0, 0, 0, 0, -1, 0),
+    Motor3D(0, 0, 0, 0, 0, 0, 0, 1), Motor3D(0, 0, 0, 0, 0, 0, 0, -1),
+    Motor3D(1, 0, 0, 0, 1, 0, 0, 0), Motor3D(1, 0, 0, 0, -1, 0, 0, 0),
+    Motor3D(1, 0, 0, 0, 0, 1, 0, 0), Motor3D(1, 0, 0, 0, 0, -1, 0, 0),
+    Motor3D(1, 0, 0, 0, 0, 0, 1, 0), Motor3D(1, 0, 0, 0, 0, 0, -1, 0),
+    Motor3D(1, 0, 0, 0, 0, 0, 0, 1), Motor3D(1, 0, 0, 0, 0, 0, 0, -1),
+    Motor3D(-1, 0, 0, 0, 1, 0, 0, 0), Motor3D(-1, 0, 0, 0, -1, 0, 0, 0),
+    Motor3D(-1, 0, 0, 0, 0, 1, 0, 0), Motor3D(-1, 0, 0, 0, 0, -1, 0, 0),
+    Motor3D(-1, 0, 0, 0, 0, 0, 1, 0), Motor3D(-1, 0, 0, 0, 0, 0, -1, 0),
+    Motor3D(-1, 0, 0, 0, 0, 0, 0, 1), Motor3D(-1, 0, 0, 0, 0, 0, 0, -1)
+]
+
 weight_norm(a::Motor3D) = norm(SA[a[1], a[2], a[3], a[4]])
 bulk_norm(a::Motor3D) = norm(SA[a[5], a[6], a[7], a[8]])
 
@@ -78,52 +98,15 @@ reverse(a::Motor3D) = Motor3D(a[1], -a[2], -a[3], -a[4], -a[5], -a[6], -a[7], a[
 anti_reverse(a::Motor3D) = reverse(a)
 
 # not sure why this doesn't work
-function Base.sqrt(m::Motor3D)
+function Base.sqrt(m_input::Motor3D)
+    m = if m_input[1] ≈ -1
+        -m_input
+    else
+        m_input
+    end
     normalize(Motor3D(1 + m[1], m[2], m[3], m[4], m[5], m[6], m[7], m[8]))
 end
 
-#=
-function get_position(a_ununitized::Motor3D)
-    a = unitize(a_ununitized)
-    A14 = a[2] * a[7] - a[3] * a[6]
-    A24 = a[3] * a[5] - a[1] * a[7]
-    A34 = a[1] * a[6] - a[2] * a[5]
-
-    B14 = a[5] * a[4] - a[1] * a[8]
-    B24 = a[6] * a[4] - a[2] * a[8]
-    B34 = a[7] * a[4] - a[3] * a[8]
-
-    return Point3D((A14 + B14) * 2, (A24 + B24) * 2, (A34 + B34) * 2)
-end
-=#
-
-#=
-function get_transform_matrix(m_unnormalized::Motor3D)
-    m = normalize(m_unnormalized)
-    #m = m_unnormalized
-    a0, a1, a2, a3, a4, a5, a6, a7 = m[4], m[5], m[6], m[7], m[2], m[1], m[3], m[8]
-    _2a0 = 2a0
-    _2a4 = 2a4
-    _2a5 = 2a5
-    a0a0 = a0 * a0
-    a4a4 = a4 * a4
-    a5a5 = a5 * a5
-    a6a6 = a6 * a6
-    _2a6 = 2 * a6
-    _2a0a4 = _2a0 * a4
-    _2a0a5 = _2a0 * a5
-    _2a0a6 = _2a0 * a6
-    _2a4a5 = _2a4 * a5
-    _2a4a6 = _2a4 * a6
-    _2a5a6 = _2a5 * a6
-    SA[
-        (a0a0+a4a4-a5a5-a6a6) (_2a4a5+_2a0a6) (_2a4a6-_2a0a5) ((_2a0*a3)+(_2a4*a7)-(_2a6*a2)-(_2a5*a1))
-        (_2a4a5-_2a0a6) (a0a0-a4a4+a5a5-a6a6) (_2a0a4+_2a5a6) ((_2a4*a1)-(_2a0*a2)-(_2a6*a3)+(_2a5*a7))
-        (_2a0a5+_2a4a6) (_2a5a6-_2a0a4) (a0a0-a4a4-a5a5+a6a6) ((_2a0*a1)+(_2a4*a2)+(_2a5*a3)+(_2a6*a7))
-        0 0 0 (a0a0+a4a4+a5a5+a6a6)
-    ]
-end
-=#
 function get_transform_matrix(a::Motor3D)
     return SA[
         (a[1]^2+a[2]^2-(a[3]^2)-(a[4]^2)) (2(a[2]*a[3]+a[1]*a[4])) (2(a[2]*a[4]-a[1]*a[3])) (2(a[7]*a[3]-a[5]*a[1]-a[8]*a[2]-a[6]*a[4]))
@@ -132,129 +115,28 @@ function get_transform_matrix(a::Motor3D)
         0 0 0 1
     ]
 end
-#=
-function get_transform_matrix(b::Motor3D)
-    SA[
-        (b[4]^2+b[1]^2-(b[2]^2)-(b[3]^2)) (2b[1]*b[2]+2b[4]*b[3]) (2b[1]*b[3]-2b[4]*b[2]) (2b[7]*b[2]-2b[5]*b[4]-2b[8]*b[1]-2b[6]*b[3])
-        (2b[1]*b[2]-2b[4]*b[3]) (b[4]^2+b[2]^2-(b[1]^2)-(b[3]^2)) (2b[4]*b[1]+2b[2]*b[3]) (2b[5]*b[3]-2b[8]*b[2]-2b[6]*b[4]-2b[7]*b[1])
-        (2b[4]*b[2]+2b[1]*b[3]) (2b[2]*b[3]-2b[4]*b[1]) (b[4]^2+b[3]^2-(b[1]^2)-(b[2]^2)) (2b[6]*b[1]-2b[5]*b[2]-2b[8]*b[3]-2b[7]*b[4])
-        0 0 0 (b[4]^2+b[1]^2+b[2]^2+b[3]^2)
-    ]
-end
-=#
 
-#=
-function get_transform_matrix_2(a_ununitized::Motor3D)
-    a = unitize(a_ununitized)
-    vx2 = a[1] * a[1]
-    vy2 = a[2] * a[2]
-    vz2 = a[3] * a[3]
-
-    A11 = 1 - (vy2 + vz2) * 2
-    A22 = 1 - (vz2 + vx2) * 2
-    A33 = 1 - (vx2 + vy2) * 2
-    A12 = a[1] * a[2]
-    A13 = a[3] * a[1]
-    A23 = a[2] * a[3]
-    A14 = a[2] * a[7] - a[3] * a[6]
-    A24 = a[3] * a[5] - a[1] * a[7]
-    A34 = a[1] * a[6] - a[2] * a[5]
-
-    B12 = a[3] * a[4]
-    B31 = a[2] * a[4]
-    B23 = a[1] * a[4]
-    B14 = a[5] * a[4] - a[1] * a[8]
-    B24 = a[6] * a[4] - a[2] * a[8]
-    B34 = a[7] * a[4] - a[3] * a[8]
-
-    return SA[A11 (A12-B12)*2 (A13+B31)*2 (A14+B14)*2
-        (A12+B12)*2 A22 (A23-B23)*2 (A24+B24)*2
-        (A13-B31)*2 (A23+B23)*2 A33 (A34+B34)*2
-        0 0 0 1
-    ]
-end
-=#
 
 function get_inv_transform_matrix(a_ununitized::Motor3D)
     Base.inv(get_transform_matrix(a_ununitized))
 end
-#=
-function get_inv_transform_matrix(a_ununitized::Motor3D)
-    a = unitize(a_ununitized)
-    vx2 = a[1] * a[1]
-    vy2 = a[2] * a[2]
-    vz2 = a[3] * a[3]
-
-    A11 = 1 - (vy2 + vz2) * 2
-    A22 = 1 - (vz2 + vx2) * 2
-    A33 = 1 - (vx2 + vy2) * 2
-    A12 = a[1] * a[2]
-    A13 = a[3] * a[1]
-    A23 = a[2] * a[3]
-    A14 = a[2] * a[7] - a[3] * a[6]
-    A24 = a[3] * a[5] - a[1] * a[7]
-    A34 = a[1] * a[6] - a[2] * a[5]
-
-    B12 = a[3] * a[4]
-    B31 = a[2] * a[4]
-    B23 = a[1] * a[4]
-    B14 = a[5] * a[4] - a[1] * a[8]
-    B24 = a[6] * a[4] - a[2] * a[8]
-    B34 = a[7] * a[4] - a[3] * a[8]
-
-
-    return SA[A11 (A12+B12)*2 (A13-B31)*2 (A14-B14)*2
-        (A12-B12)*2 A22 (A23+B23)*2 (A24-B24)*2
-        (A13+B31)*2 (A23-B23)*2 A33 (A34-B34)*2
-        0 0 0 1
-    ]
-end
-=#
 
 function get_transform_and_inv_matrices(a_ununitized::Motor3D)
     matrix = get_transform_matrix(a_ununitized)
     inv_matrix = get_inv_transform_matrix(a_ununitized)
     (; matrix, inv_matrix)
 end
-#=
-function get_transform_and_inv_matrices(a_ununitized::Motor3D)
-    a = unitize(a_ununitized)
-    vx2 = a[1] * a[1]
-    vy2 = a[2] * a[2]
-    vz2 = a[3] * a[3]
 
-    A11 = 1 - (vy2 + vz2) * 2
-    A22 = 1 - (vz2 + vx2) * 2
-    A33 = 1 - (vx2 + vy2) * 2
-    A12 = a[1] * a[2]
-    A13 = a[3] * a[1]
-    A23 = a[2] * a[3]
-    A14 = a[2] * a[7] - a[3] * a[6]
-    A24 = a[3] * a[5] - a[1] * a[7]
-    A34 = a[1] * a[6] - a[2] * a[5]
 
-    B12 = a[3] * a[4]
-    B31 = a[2] * a[4]
-    B23 = a[1] * a[4]
-    B14 = a[5] * a[4] - a[1] * a[8]
-    B24 = a[6] * a[4] - a[2] * a[8]
-    B34 = a[7] * a[4] - a[3] * a[8]
+function motor_from_transform(M::SMatrix{4,4,T}) where {T<:Number}
+    p1 = Plane3D(M[1, 1], M[1, 2], M[1, 3], M[1, 4])
+    p2 = Plane3D(M[2, 1], M[2, 2], M[2, 3], M[2, 4])
+    p3 = Plane3D(M[3, 1], M[3, 2], M[3, 3], M[3, 4])
 
-    matrix = SA[A11 (A12-B12)*2 (A13+B31)*2 (A14+B14)*2
-        (A12+B12)*2 A22 (A23-B23)*2 (A24+B24)*2
-        (A13-B31)*2 (A23+B23)*2 A33 (A34+B34)*2
-        0 0 0 1
-    ]
-    inv_matrix = SA[A11 (A12+B12)*2 (A13-B31)*2 (A14-B14)*2
-        (A12-B12)*2 A22 (A23+B23)*2 (A24-B24)*2
-        (A13+B31)*2 (A23-B23)*2 A33 (A34-B34)*2
-        0 0 0 1
-    ]
-    return (; matrix, inv_matrix)
+    #m1 = Motor3D(1 )
+    Motor3D(1, 0, 0, 0, 0, 0, 0, 0)
 end
-=#
-
-
+#=
 function motor_from_transform(M::SMatrix{4,4,T}) where {T<:Number}
     # rotation stuff first
     M11 = M[1, 1]
@@ -312,5 +194,6 @@ function motor_from_transform(M::SMatrix{4,4,T}) where {T<:Number}
 
     unitize(Motor3D(vx, vy, vz, vw, mx, my, mz, mw))
 end
+=#
 
 
