@@ -128,6 +128,8 @@ using PGA3D, Test, SafeTestsets, Logging, PrettyPrinting, StaticArrays, Random
                 @info testmotor2
                 @info testpoint
                 #@test transform(testmotor2, testpoint) ≈ transform(testmotor, testpoint) atol = atol
+
+                # this is a good sanity check but it's not enough to ensure that the motor is the same
                 @test transform(sqrt(testmotor2 * testmotor2), testpoint) ≈ transform(sqrt(testmotor * testmotor), testpoint) atol = atol
             else
                 @test isapprox(testmotor2, testmotor; atol=atol) || isapprox(testmotor2, -testmotor; atol=atol)
