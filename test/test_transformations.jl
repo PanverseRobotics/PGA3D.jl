@@ -210,7 +210,7 @@ using PGA3D, Test, SafeTestsets, Logging, PrettyPrinting, StaticArrays, Random
                 special_line_test_list[i]
             else
                 # can't do gaussians here because if the rotation part is too big then !(log(exp(testline)) ≈ testline) 
-                rotvalue = 2 .* rand(3) .- 1
+                rotvalue = 3 .* rand(3) .- 1.5
                 transvalue = randn(3)
                 Line3D(rotvalue..., transvalue...)
             end

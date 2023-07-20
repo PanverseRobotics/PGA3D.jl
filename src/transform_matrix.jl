@@ -120,8 +120,6 @@ function motor_from_transform(M::SMatrix{4,4,T}) where {T<:Number}
         M[3, 1] M[3, 2] M[3, 3]
     ]
     rotor = motor_from_rotation(rot)
-    transpoint = Point3D(M[1, 4], M[2, 4], M[3, 4])
-
-    translator = Motor3D(1, 0, 0, 0, -(1 // 2) * transpoint[1], -(1 // 2) * transpoint[2], -(1 // 2) * transpoint[3], 0)
+    translator = Motor3D(1, 0, 0, 0, -(1 // 2) * M[1, 4], -(1 // 2) * M[2, 4], -(1 // 2) * M[3, 4], 0)
     return normalize(translator * rotor)
 end
