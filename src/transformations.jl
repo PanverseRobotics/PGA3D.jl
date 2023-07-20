@@ -1,4 +1,4 @@
-function transform(a::Motor3D, b::Point3D) # assumes that a is normalized and b is normalized
+function transform(a::Motor3D, b::Point3D)
     a1a1 = a[1] * a[1]
     a2a2 = a[2] * a[2]
     a3a3 = a[3] * a[3]
@@ -9,14 +9,15 @@ function transform(a::Motor3D, b::Point3D) # assumes that a is normalized and b 
     a2a4 = a[2] * a[4]
     a1a2 = a[1] * a[2]
     a3a4 = a[3] * a[4]
-    return Point3D(b[1] * (a1a1 + a2a2 - a3a3 - a4a4) + 2 * (b[2] * (a1a4 + a2a3) + b[3] * (-a1a3 + a2a4) + (-a[1] * a[5] - a[2] * a[8] + a[3] * a[7] - a[4] * a[6])),
-        b[2] * (a1a1 - a2a2 + a3a3 - a4a4) + 2 * (b[1] * (-a1a4 + a2a3) + b[3] * (a1a2 + a3a4) + (-a[1] * a[6] - a[2] * a[7] - a[3] * a[8] + a[4] * a[5])),
-        b[3] * (a1a1 - a2a2 - a3a3 + a4a4) + 2 * (b[1] * (a1a3 + a2a4) + b[2] * (-a1a2 + a3a4) + (-a[1] * a[7] + a[2] * a[6] - a[3] * a[5] - a[4] * a[8]))
+    return Point3D(b[1] * (a1a1 + a2a2 - a3a3 - a4a4) + 2 * (b[2] * (a1a4 + a2a3) + b[3] * (-a1a3 + a2a4) + b[4] * (-a[1] * a[5] - a[2] * a[8] + a[3] * a[7] - a[4] * a[6])),
+        b[2] * (a1a1 - a2a2 + a3a3 - a4a4) + 2 * (b[1] * (-a1a4 + a2a3) + b[3] * (a1a2 + a3a4) + b[4] * (-a[1] * a[6] - a[2] * a[7] - a[3] * a[8] + a[4] * a[5])),
+        b[3] * (a1a1 - a2a2 - a3a3 + a4a4) + 2 * (b[1] * (a1a3 + a2a4) + b[2] * (-a1a2 + a3a4) + b[4] * (-a[1] * a[7] + a[2] * a[6] - a[3] * a[5] - a[4] * a[8])),
+        b[4] * (a1a1 + a2a2 + a3a3 + a4a4)
     )
 end
 
 
-function transform(a::Motor3D, b::Vector4D) # general multiplication
+function transform(a::Motor3D, b::Vector4D)
     a1a1 = a[1] * a[1]
     a2a2 = a[2] * a[2]
     a3a3 = a[3] * a[3]
