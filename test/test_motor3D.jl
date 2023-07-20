@@ -109,20 +109,10 @@ end
             motoridentity = identity_motor()
             Random.seed!(1)
             for i in 1:1000
-                testfrom = Point3D(randn(3)...)
-                testto = Point3D(randn(3)...)
-                testline = line_fromto(testfrom, testto)
-                testangle = rand() * 0.5
-                testdisp = rand()
-                testmotor = normalize(motor_screw(testline, testangle, testdisp))
+                testmotor = normalize(Motor3D(randn(8)...))
                 testmatrix, testmatrixinv = get_transform_and_inv_matrices(testmotor)
 
-                testfrom2 = Point3D(randn(3)...)
-                testto2 = Point3D(randn(3)...)
-                testline2 = line_fromto(testfrom2, testto2)
-                testangle2 = rand() * 0.5
-                testdisp2 = rand()
-                testmotor2 = normalize(motor_screw(testline2, testangle2, testdisp2))
+                testmotor2 = normalize(Motor3D(randn(8)...))
                 testmatrix2, testmatrixinv2 = get_transform_and_inv_matrices(testmotor2)
 
                 # test that matrix multiplication and inversion are the same as motor multiplication and reversion, respectively
