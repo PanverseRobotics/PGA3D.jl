@@ -19,7 +19,9 @@ basis : "1,e1,e2,e3,e0,e23,e31,e12,e01,e02,e03,e032,e013,e021,e123,e0123".split(
     { name : "bivector", layout : ["e23", "e31", "e12","e01", "e02", "e03"] },
     { name : "trivector", layout : ["e032", "e013", "e021", "e123"] },
     { name : "quadvector", layout : ["e0123"] },
-    { name : "rotor", layout : ["1", "e23", "e31", "e12", "e01", "e02", "e03", "e0123"] },
+    { name : "motor", layout : ["1", "e23", "e31", "e12", "e01", "e02", "e03", "e0123"] },
+    { name : "rotor", layout : ["1", "e23", "e31", "e12"] },
+    { name : "translator", layout : ["1", "e01", "e02", "e03"] },
     { name : "multivector", layout : "1,e1,e2,e3,e0,e23,e31,e12,e01,e02,e03,e032,e013,e021,e123,e0123,".split(',') }
   ]
 =#
