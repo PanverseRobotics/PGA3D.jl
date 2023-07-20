@@ -24,7 +24,7 @@ end
 function Base.log(m::Motor3D)
     # https://arxiv.org/abs/2206.07496 section 8.2
     #m = unitize(m_ununitized)
-    if abs(m[4]) ≈ 1
+    if abs(m[1]) ≈ 1
         return Line3D(0, 0, 0, m[5], m[6], m[7])
     else
         a = 1 / (1 - m[1] * m[1])
