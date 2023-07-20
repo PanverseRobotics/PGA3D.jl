@@ -126,20 +126,14 @@ end
                 testmatrix2, testmatrixinv2 = get_transform_and_inv_matrices(testmotor2)
 
                 # test that matrix multiplication and inversion are the same as motor multiplication and reversion, respectively
-                #@info testmatrix
-                #@info testmatrix2
-                #@info testmotor
-                #@info testmotor2
-                #@info testmatrix * testmatrix2
-                #@info testmotor * testmotor2
-                #@test testmatrix * testmatrix2 ≈ get_transform_matrix(testmotor * testmotor2)
-                #@test testmatrix * testmatrixinv2 ≈ get_transform_matrix(testmotor * PGA3D.reverse(testmotor2))
-                #@test testmatrixinv * testmatrix2 ≈ get_transform_matrix(PGA3D.reverse(testmotor) * testmotor2)
-                #@test testmatrixinv * testmatrixinv2 ≈ get_transform_matrix(PGA3D.reverse(testmotor) * PGA3D.reverse(testmotor2))
+                @test testmatrix * testmatrix2 ≈ get_transform_matrix(testmotor * testmotor2)
+                @test testmatrix * testmatrixinv2 ≈ get_transform_matrix(testmotor * PGA3D.reverse(testmotor2))
+                @test testmatrixinv * testmatrix2 ≈ get_transform_matrix(PGA3D.reverse(testmotor) * testmotor2)
+                @test testmatrixinv * testmatrixinv2 ≈ get_transform_matrix(PGA3D.reverse(testmotor) * PGA3D.reverse(testmotor2))
 
                 # test that motor reverse is motor inverse for unitized motors
-                #@test motoridentity ≈ testmotor * PGA3D.reverse(testmotor)
-                #@test motoridentity ≈ PGA3D.reverse(testmotor) * testmotor
+                @test motoridentity ≈ testmotor * PGA3D.reverse(testmotor)
+                @test motoridentity ≈ PGA3D.reverse(testmotor) * testmotor
 
             end
         end
@@ -167,19 +161,10 @@ end
                 testmotornormed = normalize(testmotor)
                 atol = 1e-6
                 @test isapprox(weight_norm(testmotornormed), 1.0; atol=atol)
-                #@info testmotornormed
-                #@test isapprox(dot(testmotornormed[1:4], testmotornormed[5:8]), 0.0; atol=atol)
                 testmotornormedsq = testmotornormed * PGA3D.reverse(testmotornormed)
-                #@info testmotornormedsq
                 @test isapprox(testmotornormedsq, identity_motor(); atol=atol)
                 #@test get_transform_matrix(testmotor) ≈ get_transform_matrix(testmotornormed)
                 testmotorsq = testmotor * PGA3D.reverse(testmotor)
-                #@info testmotorsq
-                #@info testmotornormedsq
-
-                #@info dot(testmotor[1:4], testmotor[5:8])
-                #@info dot(testmotornormed[1:4], testmotornormed[5:8])
-
 
                 # test against the cheat sheet formula for normalizing that's inefficient
                 m = testmotor
