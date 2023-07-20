@@ -17,14 +17,11 @@ Base.length(el::AbstractPGA3DElement) = length(internal_vec(el))
 Base.isapprox(a::AbstractPGA3DElement, b::AbstractPGA3DElement; kwargs...) = isapprox(internal_vec(a), internal_vec(b); kwargs...)
 Base.isequal(a::AbstractPGA3DElement, b::AbstractPGA3DElement) = isequal(internal_vec(a), internal_vec(b))
 
-
-abstract type AbstractVector4D{T<:Number} <: AbstractPGA3DElement{T} end
-
-Base.size(::AbstractVector4D) = (4,)
-Base.length(::AbstractVector4D) = 4
-
-abstract type AbstractVector3D{T<:Number} <: AbstractPGA3DElement{T} end
-
-Base.size(::AbstractVector3D) = (3,)
-Base.length(::AbstractVector3D) = 3
+# if the types are the same then we can easily define addition, subtraction, negation, and scalar multiplication
+# we can probably define more general versions of this but the type math gets a little trickier
+Base.:(+)(a::P, b::P) where {P<:AbstractPGA3DElement} = P((internal_vec(a) .+ internal_vec(b)))
+Base.:(-)(a::P, b::P) where {P<:AbstractPGA3DElement} = P((internal_vec(a) .- internal_vec(b)))
+Base.:(-)(a::P) where {P<:AbstractPGA3DElement} = P(-internal_vec(a))
+Base.:(*)(a::P, b::Real) where {P<:AbstractPGA3DElement} = P((internal_vec(a) .* b))
+Base.:(*)(a::Real, b::P) where {P<:AbstractPGA3DElement} = P((a .* internal_vec(b)))
 

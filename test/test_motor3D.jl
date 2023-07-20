@@ -109,10 +109,19 @@ end
             motoridentity = identity_motor()
             Random.seed!(1)
             for i in 1:1000
-                testmotor = normalize(Motor3D(randn(8)...))
-                testmatrix, testmatrixinv = get_transform_and_inv_matrices(testmotor)
+                (; testmotor, testmotor2) = try
+                    testmotor = normalize(Motor3D(randn(8)...))
+                    testmotor2 = normalize(Motor3D(randn(8)...))
 
-                testmotor2 = normalize(Motor3D(randn(8)...))
+                    (; testmotor, testmotor2)
+                catch e
+                    @test isa(e, DomainError)
+                    @test isa(e.val, Motor3D)
+                    @test e.msg == "Motor3D must have a non-zero rotational part to normalize."
+                    continue
+                end
+
+                testmatrix, testmatrixinv = get_transform_and_inv_matrices(testmotor)
                 testmatrix2, testmatrixinv2 = get_transform_and_inv_matrices(testmotor2)
 
                 # test that matrix multiplication and inversion are the same as motor multiplication and reversion, respectively
@@ -124,6 +133,7 @@ end
                 # test that motor reverse is motor inverse for unitized motors
                 @test motoridentity ≈ testmotor * PGA3D.reverse(testmotor)
                 @test motoridentity ≈ PGA3D.reverse(testmotor) * testmotor
+
 
             end
         end
@@ -145,7 +155,7 @@ end
                 catch e
                     @test isa(e, DomainError)
                     @test isa(e.val, Motor3D)
-                    @test e.msg == "Motor3D must have a nonzero rotational part to normalize."
+                    @test e.msg == "Motor3D must have a non-zero rotational part to normalize."
                 end
             else
                 testmotornormed = normalize(testmotor)

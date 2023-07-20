@@ -13,6 +13,10 @@ using PGA3D, Test, SafeTestsets, Logging, StaticArrays, Random, LinearAlgebra
         tplane2 = dual(tpoint2)
         tplane3 = dual(tpoint3)
 
+        @test tpoint1 ≈ undual(tplane1) atol = atol
+        @test tpoint2 ≈ undual(tplane2) atol = atol
+        @test tpoint3 ≈ undual(tplane3) atol = atol
+
         @test tpoint1 ∨ tpoint1 ≈ Line3D(zeros(6)...) atol = atol
         @test tplane1 ∧ tplane1 ≈ Line3D(zeros(6)...) atol = atol
 

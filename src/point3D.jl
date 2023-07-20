@@ -1,4 +1,4 @@
-struct Point3D{T<:Number} <: AbstractVector4D{T}
+struct Point3D{T<:Number} <: AbstractPGA3DElement{T}
     vec::SVector{4,T}
 
     function Point3D(e032::Number, e013::Number, e021::Number)
