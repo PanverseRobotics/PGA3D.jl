@@ -1,14 +1,14 @@
 
-struct Vector4D{T<:Real} <: AbstractVector4D{T}
+struct Vector4D{T<:Number} <: AbstractVector4D{T}
     vec::SVector{4,T}
 
-    function Vector4D(x::Real, y::Real, z::Real, w::Real)
+    function Vector4D(x::Number, y::Number, z::Number, w::Number)
         T = promote_type(eltype(x), eltype(y), eltype(z), eltype(w))
         vec = SVector{4,T}(promote(x, y, z, w)...)
         new{T}(vec)
     end
 
-    function Vector4D(vec::SVector{4,T}) where {T<:Real}
+    function Vector4D(vec::SVector{4,T}) where {T<:Number}
         new{T}(vec)
     end
 
@@ -16,12 +16,12 @@ end
 
 internal_vec(v::Vector4D) = v.vec
 
-get_x(v::Vector4D) = v[1]
-get_y(v::Vector4D) = v[2]
-get_z(v::Vector4D) = v[3]
-get_w(v::Vector4D) = v[4]
+get_e032(v::Vector4D) = v[1]
+get_e013(v::Vector4D) = v[2]
+get_e021(v::Vector4D) = v[3]
+get_e123(v::Vector4D) = v[4]
 
-Vector4D(el::AbstractPGA3DElement{T}) where {T<:Real} = Base.convert(Vector4D{T}, el)
+Vector4D(el::AbstractPGA3DElement{T}) where {T<:Number} = Base.convert(Vector4D{T}, el)
 
 # Define the basic arithmetic operations for Vector4D
 # I think this interface prevents broadcast fusion from happening but we can fix that later if we need the extra performance.

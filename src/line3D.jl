@@ -1,13 +1,13 @@
-struct Line3D{T<:Real} <: AbstractPGA3DElement{T}
+struct Line3D{T<:Number} <: AbstractPGA3DElement{T}
     vec::SVector{6,T}
 
-    function Line3D(vx::Real, vy::Real, vz::Real, mx::Real, my::Real, mz::Real)
+    function Line3D(vx::Number, vy::Number, vz::Number, mx::Number, my::Number, mz::Number)
         T = promote_type(eltype(vx), eltype(vy), eltype(vz), eltype(mx), eltype(my), eltype(mz))
         vec = SVector{6,T}(promote(vx, vy, vz, mx, my, mz)...)
         new{T}(vec)
     end
 
-    function Line3D(vec::SVector{6,T}) where {T<:Real}
+    function Line3D(vec::SVector{6,T}) where {T<:Number}
         new{T}(vec)
     end
 end
@@ -16,6 +16,13 @@ internal_vec(a::Line3D) = a.vec
 
 Base.length(::Line3D) = 6
 Base.size(::Line3D) = (6,)
+
+get_e23(a::Line3D) = a[1]
+get_e31(a::Line3D) = a[2]
+get_e12(a::Line3D) = a[3]
+get_e01(a::Line3D) = a[4]
+get_e02(a::Line3D) = a[5]
+get_e03(a::Line3D) = a[6]
 
 line_vector(a::Line3D) = SA[a[1], a[2], a[3]]
 line_moment(a::Line3D) = SA[a[4], a[5], a[6]]

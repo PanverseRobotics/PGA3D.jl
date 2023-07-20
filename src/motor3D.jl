@@ -1,14 +1,14 @@
-struct Motor3D{T<:Real} <: AbstractPGA3DElement{T}
+struct Motor3D{T<:Number} <: AbstractPGA3DElement{T}
     vec::SVector{8,T}
 
-    function Motor3D(vx::Real, vy::Real, vz::Real, vw::Real, mx::Real, my::Real, mz::Real, mw::Real)
-        T = promote_type(eltype(vx), eltype(vy), eltype(vz), eltype(vw), eltype(mx), eltype(my), eltype(mz), eltype(mw))
-        vec = SVector{8,T}(promote(vx, vy, vz, vw, mx, my, mz, mw)...)
-        new{T}(vec)
+    function Motor3D(scalar::Number, e23::Number, e31::Number, e12::Number, e01::Number, e02::Number, e03::Number, e0123::Number)
+        T = promote_type(eltype(scalar), eltype(e23), eltype(e31), eltype(e12), eltype(e01), eltype(e02), eltype(e03), eltype(e0123))
+        vec = SVector{8,T}(promote(scalar, e23, e31, e12, e01, e02, e03, e0123)...)
+        return new{T}(vec)
     end
 
-    function Motor3D(vec::SVector{8,T}) where {T<:Real}
-        new{T}(vec)
+    function Motor3D(vec::SVector{8,T}) where {T<:Number}
+        return new{T}(vec)
     end
 end
 
@@ -18,166 +18,68 @@ Base.length(::Motor3D) = 8
 Base.size(::Motor3D) = (8,)
 
 
-get_vx(a::Motor3D) = a[1]
-get_vy(a::Motor3D) = a[2]
-get_vz(a::Motor3D) = a[3]
-get_vw(a::Motor3D) = a[4]
-get_mx(a::Motor3D) = a[5]
-get_my(a::Motor3D) = a[6]
-get_mz(a::Motor3D) = a[7]
-get_mw(a::Motor3D) = a[8]
+get_scalar(a::Motor3D) = a[1]
+get_e23(a::Motor3D) = a[2]
+get_e31(a::Motor3D) = a[3]
+get_e12(a::Motor3D) = a[4]
+get_e01(a::Motor3D) = a[5]
+get_e02(a::Motor3D) = a[6]
+get_e03(a::Motor3D) = a[7]
+get_e0123(a::Motor3D) = a[8]
 
 Base.:(+)(a::Motor3D, b::Motor3D) = Motor3D(internal_vec(a) .+ internal_vec(b))
 Base.:(-)(a::Motor3D, b::Motor3D) = Motor3D(internal_vec(a) .- internal_vec(b))
 Base.:(-)(a::Motor3D) = Motor3D(-internal_vec(a))
-Base.:(*)(a::Motor3D, b::Real) = Motor3D((internal_vec(a) .* b))
-Base.:(*)(a::Real, b::Motor3D) = Motor3D((a .* internal_vec(b)))
-#⋅(a::Motor3D, b::Motor3D) = internal_vec(a) ⋅ internal_vec(b)
-#dot(a::Motor3D, b::Motor3D) = a ⋅ b
+Base.:(*)(a::Motor3D, b::Real) = Motor3D((internal_vec(a) .* b)) # this needs to be Real otherwise it might trigger on PGA elements oop
+Base.:(*)(a::Real, b::Motor3D) = Motor3D((a .* internal_vec(b))) # this needs to be Real otherwise it might trigger on PGA elements oop
 
-# this is the product from the terathon math library but it doesn't do what I think it should
-#=
-function Base.:(*)(b::Motor3D, a::Motor3D) # dual quernion geometric product
-    Motor3D(
-        a[4] * b[1] + a[1] * b[4] + a[2] * b[3] - a[3] * b[2],
-        a[4] * b[2] + a[2] * b[4] + a[3] * b[1] - a[1] * b[3],
-        a[4] * b[3] + a[3] * b[4] + a[1] * b[2] - a[2] * b[1],
-        a[4] * b[4] - a[1] * b[1] - a[2] * b[2] - a[3] * b[3],
-        a[8] * b[1] + a[5] * b[2] - a[6] * b[1] + a[7] * b[4] + b[8] * a[3] - b[5] * a[2] + b[6] * a[1] + b[7] * a[4],
-        a[8] * b[2] + a[5] * b[4] + a[6] * b[3] - a[7] * b[2] + b[8] * a[1] + b[5] * a[4] - b[6] * a[3] + b[7] * a[2],
-        a[8] * b[3] - a[5] * b[3] + a[6] * b[4] + a[7] * b[1] + b[8] * a[2] + b[5] * a[3] + b[6] * a[4] - b[7] * a[1],
-        a[8] * b[4] - a[5] * b[1] - a[6] * b[2] - a[7] * b[3] + b[8] * a[4] - b[5] * a[1] - b[6] * a[2] - b[7] * a[3]
-    )
-end
-=#
 # this is the one from enki's stuff, translated
 function Base.:(*)(a::Motor3D, b::Motor3D)
-    Motor3D(
-        b[1] * a[4] + b[2] * a[3] - b[3] * a[2] + b[4] * a[1],
-        b[2] * a[4] - b[1] * a[3] + b[4] * a[2] + b[3] * a[1],
-        b[3] * a[4] + b[4] * a[3] + b[1] * a[2] - b[2] * a[1],
-        b[4] * a[4] - b[3] * a[3] - b[2] * a[2] - b[1] * a[1],
-        b[5] * a[4] + b[4] * a[5] - b[3] * a[6] + b[2] * a[7] + b[6] * a[3] - b[7] * a[2] - b[8] * a[1] - b[1] * a[8],
-        b[6] * a[4] + b[3] * a[5] + b[4] * a[6] - b[1] * a[7] - b[5] * a[3] - b[8] * a[2] + b[7] * a[1] - b[2] * a[8],
-        b[7] * a[4] - b[2] * a[5] + b[1] * a[6] + b[4] * a[7] - b[8] * a[3] + b[5] * a[2] - b[6] * a[1] - b[3] * a[8],
-        b[8] * a[4] + b[1] * a[5] + b[2] * a[6] + b[3] * a[7] + b[7] * a[3] + b[6] * a[2] + b[5] * a[1] + b[4] * a[8]
+    return Motor3D(
+        a[1] * b[1] - a[2] * b[2] - a[3] * b[3] - a[4] * b[4],
+        a[1] * b[2] + a[2] * b[1] - a[3] * b[4] + a[4] * b[3],
+        a[1] * b[3] + a[2] * b[4] + a[3] * b[1] - a[4] * b[2],
+        a[1] * b[4] - a[2] * b[3] + a[3] * b[2] + a[4] * b[1],
+        a[1] * b[5] - a[2] * b[8] - a[3] * b[7] + a[4] * b[6] + a[5] * b[1] - a[6] * b[4] + a[7] * b[3] - a[8] * b[2],
+        a[1] * b[6] + a[2] * b[7] - a[3] * b[8] - a[4] * b[5] + a[5] * b[4] + a[6] * b[1] - a[7] * b[2] - a[8] * b[3],
+        a[1] * b[7] - a[2] * b[6] + a[3] * b[5] - a[4] * b[8] - a[5] * b[3] + a[6] * b[2] + a[7] * b[1] - a[8] * b[4],
+        a[1] * b[8] + a[2] * b[5] + a[3] * b[6] + a[4] * b[7] + a[5] * b[2] + a[6] * b[3] + a[7] * b[4] + a[8] * b[1]
     )
 end
-# res[10]=b[10]*a[0]+b[9]*a[8]-b[8]*a[9]+b[0]*a[10];
-# res[1]=b[1]*a[4]+b[2]*a[3]-b[3]*a[2]+b[4]*a[1];
-# res[9]=b[9]*a[0]-b[10]*a[8]+b[0]*a[9]+b[8]*a[10];
-# res[2]=b[2]*a[4]-b[1]*a[3]+b[4]*a[2]+b[3]*a[1];
-# res[8]=b[8]*a[0]+b[0]*a[8]+b[10]*a[9]-b[9]*a[10];
-# res[3]=b[3]*a[4]+b[4]*a[3]+b[1]*a[2]-b[2]*a[1];
-# res[0]=b[0]*a[0]-b[8]*a[8]-b[9]*a[9]-b[10]*a[10];
-# res[4]=b[4]*a[4]-b[3]*a[3]-b[2]*a[2]-b[1]*a[1];
-# res[5]=b[5]*a[0]+b[0]*a[5]-b[8]*a[6]+b[9]*a[7]+b[6]*a[8]-b[7]*a[9]-b[15]*a[10]-b[10]*a[15];
-# res[5]=b[5]*a[4]+b[4]*a[5]-b[3]*a[6]+b[2]*a[7]+b[6]*a[3]-b[7]*a[2]-b[8]*a[1]-b[1]*a[8];
-# res[6]=b[6]*a[0]+b[8]*a[5]+b[0]*a[6]-b[10]*a[7]-b[5]*a[8]-b[15]*a[9]+b[7]*a[10]-b[9]*a[15];
-# res[6]=b[6]*a[4]+b[3]*a[5]+b[4]*a[6]-b[1]*a[7]-b[5]*a[3]-b[8]*a[2]+b[7]*a[1]-b[2]*a[8];
-# res[7]=b[7]*a[0]-b[9]*a[5]+b[10]*a[6]+b[0]*a[7]-b[15]*a[8]+b[5]*a[9]-b[6]*a[10]-b[8]*a[15];
-# res[7]=b[7]*a[4]-b[2]*a[5]+b[1]*a[6]+b[4]*a[7]-b[8]*a[3]+b[5]*a[2]-b[6]*a[1]-b[3]*a[8];
-# res[15]=b[15]*a[0]+b[10]*a[5]+b[9]*a[6]+b[8]*a[7]+b[7]*a[8]+b[6]*a[9]+b[5]*a[10]+b[0]*a[15];
-# res[8]=b[8]*a[4]+b[1]*a[5]+b[2]*a[6]+b[3]*a[7]+b[7]*a[3]+b[6]*a[2]+b[5]*a[1]+b[4]*a[8];
-# mapping: 0 -> 4, 5->5, 6->6, 7->7, 8 -> 3, 9 -> 2, 10 -> 1, 15 -> 8
-#=
-res[0]=b[0]*a[0]-b[8]*a[8]-b[9]*a[9]-b[10]*a[10]
-res[5]=b[5]*a[0]+b[0]*a[5]-b[8]*a[6]+b[9]*a[7]+b[6]*a[8]-b[7]*a[9]-b[15]*a[10]-b[10]*a[15]
-res[6]=b[6]*a[0]+b[8]*a[5]+b[0]*a[6]-b[10]*a[7]-b[5]*a[8]-b[15]*a[9]+b[7]*a[10]-b[9]*a[15]
-res[7]=b[7]*a[0]-b[9]*a[5]+b[10]*a[6]+b[0]*a[7]-b[15]*a[8]+b[5]*a[9]-b[6]*a[10]-b[8]*a[15]
-res[8]=b[8]*a[0]+b[0]*a[8]+b[10]*a[9]-b[9]*a[10]
-res[9]=b[9]*a[0]-b[10]*a[8]+b[0]*a[9]+b[8]*a[10]
-res[10]=b[10]*a[0]+b[9]*a[8]-b[8]*a[9]+b[0]*a[10]
-res[15]=b[15]*a[0]+b[10]*a[5]+b[9]*a[6]+b[8]*a[7]+b[7]*a[8]+b[6]*a[9]+b[5]*a[10]+b[0]*a[15]
-=#
-#=
-# this is the one that I used to have which is just dual quaternion math
-function Base.:(*)(a::Motor3D, b::Motor3D) # dual quernion geometric product
-    Motor3D(
-        a[4] * b[1] + a[1] * b[4] + a[2] * b[3] - a[3] * b[2],
-        a[4] * b[2] + a[2] * b[4] + a[3] * b[1] - a[1] * b[3],
-        a[4] * b[3] + a[3] * b[4] + a[1] * b[2] - a[2] * b[1],
-        a[4] * b[4] - a[1] * b[1] - a[2] * b[2] - a[3] * b[3],
-        a[8] * b[1] + a[5] * b[4] + a[6] * b[3] - a[7] * b[2] + a[4] * b[5] + a[1] * b[8] + a[2] * b[7] - a[3] * b[6],
-        a[8] * b[2] + a[6] * b[4] + a[7] * b[1] - a[5] * b[3] + a[4] * b[6] + a[2] * b[8] + a[3] * b[5] - a[1] * b[7],
-        a[8] * b[3] + a[7] * b[4] + a[5] * b[2] - a[6] * b[1] + a[4] * b[7] + a[3] * b[8] + a[1] * b[6] - a[2] * b[5],
-        a[8] * b[4] - a[5] * b[1] - a[6] * b[2] - a[7] * b[3] + a[4] * b[8] - a[1] * b[5] - a[2] * b[6] - a[3] * b[7]
-    )
-end
-=#
 
-identity_motor() = Motor3D(0, 0, 0, 1, 0, 0, 0, 0)
+identity_motor() = Motor3D(1, 0, 0, 0, 0, 0, 0, 0)
 
 weight_norm(a::Motor3D) = norm(SA[a[1], a[2], a[3], a[4]])
 bulk_norm(a::Motor3D) = norm(SA[a[5], a[6], a[7], a[8]])
 
 unitize(a::Motor3D) = Motor3D(internal_vec(a) .* (1 / weight_norm(a)))
-#=
-function LinearAlgebra.normalize(m::Motor3D)
-    # this is inefficient but correct, will want to move to something like the formula below with the algebra worked out already
-    mmrev = m * reverse(m)
-    s, t = mmrev[4], mmrev[8]
-    s2 = sqrt(s)
-    study_inv_sqrt = Motor3D(0, 0, 0, 1 / s2, 0, 0, 0, t / (2 * s2^3))
-    return m * study_inv_sqrt
-end
-=#
-#=
-function LinearAlgebra.normalize(m::Motor3D)
-    A = 1 / weight_norm(m)
-    B = (m[4] * m[8] + m[1] * m[5] + m[2] * m[6] + m[3] * m[7]) * A * A * A / 2
-    Motor3D(
-        A * m[1],
-        A * m[2],
-        A * m[3],
-        A * m[4],
-        A * m[5] - B * m[1],
-        A * m[6] - B * m[2],
-        A * m[7] - B * m[3],
-        A * m[8] + B * m[4])
-end
-=#
 
 function LinearAlgebra.normalize(m::Motor3D)
-    A = 1 / weight_norm(m)
-    B = (m[4] * m[8] - (m[1] * m[5] + m[2] * m[6] + m[3] * m[7])) * A * A * A
-    Motor3D(
-        A * m[1],
-        A * m[2],
-        A * m[3],
-        A * m[4],
-        A * m[5] + B * m[1],
-        A * m[6] + B * m[2],
-        A * m[7] + B * m[3],
-        A * m[8] - B * m[4])
+    wnmsq = m[1] * m[1] + m[2] * m[2] + m[3] * m[3] + m[4] * m[4]
+    if wnmsq ≈ 0 || wnmsq < 0
+        throw(DomainError(m, "Cannot normalize a motor with zero rotational part."))
+    else
+        wnm = sqrt(wnmsq)
+        A = 1 / wnm
+        B = (m[1] * m[8] - (m[2] * m[5] + m[3] * m[6] + m[4] * m[7])) * A * A * A
+        return Motor3D(
+            A * m[1],
+            A * m[2],
+            A * m[3],
+            A * m[4],
+            A * m[5] + B * m[2],
+            A * m[6] + B * m[3],
+            A * m[7] + B * m[4],
+            A * m[8] - B * m[1])
+    end
 end
 
-reverse(a::Motor3D) = Motor3D(-a[1], -a[2], -a[3], a[4], -a[5], -a[6], -a[7], a[8])
+reverse(a::Motor3D) = Motor3D(a[1], -a[2], -a[3], -a[4], -a[5], -a[6], -a[7], a[8])
 anti_reverse(a::Motor3D) = reverse(a)
 
-#=
-Motor3D Terathon::Sqrt(const Motor3D& Q)
-{
-	float b = InverseSqrt(Q.v.w * 2.0F + 2.0F);
-	float a = -Q.m.w * (b * b);
-
-	return (Motor3D(Q.v.x * b, Q.v.y * b, Q.v.z * b, Q.v.w * b + b, (Q.v.x * a + Q.m.x) * b, (Q.v.y * a + Q.m.y) * b, (Q.v.z * a + Q.m.z) * b, Q.m.w * (b * 0.5F)));
-}
-=#
-
-#=
-function Base.sqrt(q::Motor3D)
-    if q[4] < 0
-        q = Motor3D(-internal_vec(q)) # they represent the same transform
-    end
-    b = 1 / sqrt(q[4] * 2 + 2)
-    a = -q[8] * (b * b)
-    Motor3D(q[1] * b, q[2] * b, q[3] * b, q[4] * b + b, (q[1] * a + q[5]) * b, (q[2] * a + q[6]) * b, (q[3] * a + q[7]) * b, q[8] * (b * (1 // 2)))
-end
-=#
 # not sure why this doesn't work
 function Base.sqrt(m::Motor3D)
-    normalize(Motor3D(m[1], m[2], m[3], m[4] + 1, m[5], m[6], m[7], m[8]))
+    normalize(Motor3D(1 + m[1], m[2], m[3], m[4], m[5], m[6], m[7], m[8]))
 end
 
 function get_position(a_ununitized::Motor3D)
@@ -220,21 +122,21 @@ function get_transform_matrix(m_unnormalized::Motor3D)
     ]
 end
 =#
+function get_transform_matrix(a::Motor3D)
+    return SA[
+        (a[1]^2+a[2]^2-(a[3]^2)-(a[4]^2)) (2(a[2]*a[3]+a[1]*a[4])) (2(a[2]*a[4]-a[1]*a[3])) (2(a[7]*a[3]-a[5]*a[1]-a[8]*a[2]-a[6]*a[4]))
+        (2(a[2]*a[3]-a[1]*a[4])) (a[1]^2+a[3]^2-(a[2]^2)-(a[4]^2)) (2(a[1]*a[2]+a[3]*a[4])) (2(a[5]*a[4]-a[8]*a[3]-a[6]*a[1]-a[7]*a[2]))
+        (2(a[1]*a[3]+a[2]*a[4])) (2(a[3]*a[4]-a[1]*a[2])) (a[1]^2+a[4]^2-(a[2]^2)-(a[3]^2)) (2(a[6]*a[2]-a[5]*a[3]-a[8]*a[4]-a[7]*a[1]))
+        0 0 0 1
+    ]
+end
+#=
 function get_transform_matrix(b::Motor3D)
     SA[
         (b[4]^2+b[1]^2-(b[2]^2)-(b[3]^2)) (2b[1]*b[2]+2b[4]*b[3]) (2b[1]*b[3]-2b[4]*b[2]) (2b[7]*b[2]-2b[5]*b[4]-2b[8]*b[1]-2b[6]*b[3])
         (2b[1]*b[2]-2b[4]*b[3]) (b[4]^2+b[2]^2-(b[1]^2)-(b[3]^2)) (2b[4]*b[1]+2b[2]*b[3]) (2b[5]*b[3]-2b[8]*b[2]-2b[6]*b[4]-2b[7]*b[1])
         (2b[4]*b[2]+2b[1]*b[3]) (2b[2]*b[3]-2b[4]*b[1]) (b[4]^2+b[3]^2-(b[1]^2)-(b[2]^2)) (2b[6]*b[1]-2b[5]*b[2]-2b[8]*b[3]-2b[7]*b[4])
         0 0 0 (b[4]^2+b[1]^2+b[2]^2+b[3]^2)
-    ]
-end
-#=
-function get_transform_matrix(b::Motor3D)
-    SA[
-        (b[4]^2+b[3]^2-(b[1]^2)-(b[2]^2)) (2b[2]*b[3]-2b[4]*b[1]) (2b[4]*b[2]+2b[1]*b[3]) (2b[6]*b[1]-2b[5]*b[2]-2b[8]*b[3]-2b[7]*b[4])
-        (2b[4]*b[1]+2b[2]*b[3]) (b[4]^2+b[2]^2-(b[1]^2)-(b[3]^2)) (2b[1]*b[2]-2b[4]*b[3]) (2b[5]*b[3]-2b[8]*b[2]-2b[6]*b[4]-2b[7]*b[1])
-        (2b[1]*b[3]-2b[4]*b[2]) (2b[1]*b[2]+2b[4]*b[3]) (b[4]^2+b[1]^2-(b[2]^2)-(b[3]^2)) (2b[7]*b[2]-2b[5]*b[4]-2b[8]*b[1]-2b[6]*b[3])
-        0 0 0 1
     ]
 end
 =#
@@ -351,7 +253,7 @@ end
 =#
 
 
-function motor_from_transform(M::SMatrix{4,4,T}) where {T<:Real}
+function motor_from_transform(M::SMatrix{4,4,T}) where {T<:Number}
     # rotation stuff first
     M11 = M[1, 1]
     M22 = M[2, 2]

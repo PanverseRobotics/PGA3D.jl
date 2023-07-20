@@ -1,5 +1,5 @@
 
-abstract type AbstractPGA3DElement{T<:Real} <: Number end
+abstract type AbstractPGA3DElement{T<:Number} <: Number end
 
 """
 AbstractPGA3Element are backed by an internal StaticVector so that they can be isbits and leverage high performance small arrays.
@@ -18,12 +18,12 @@ Base.isapprox(a::AbstractPGA3DElement, b::AbstractPGA3DElement; kwargs...) = isa
 Base.isequal(a::AbstractPGA3DElement, b::AbstractPGA3DElement) = isequal(internal_vec(a), internal_vec(b))
 
 
-abstract type AbstractVector4D{T<:Real} <: AbstractPGA3DElement{T} end
+abstract type AbstractVector4D{T<:Number} <: AbstractPGA3DElement{T} end
 
 Base.size(::AbstractVector4D) = (4,)
 Base.length(::AbstractVector4D) = 4
 
-abstract type AbstractVector3D{T<:Real} <: AbstractPGA3DElement{T} end
+abstract type AbstractVector3D{T<:Number} <: AbstractPGA3DElement{T} end
 
 Base.size(::AbstractVector3D) = (3,)
 Base.length(::AbstractVector3D) = 3

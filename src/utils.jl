@@ -1,7 +1,11 @@
 function increment_bracket_numbers(str::String)
-    regex = r"\[(\d+)\]"
-    new_str = replace(str, regex => s -> "[$(parse(Int, s[2:end-1]) + 1)]")
-    return new_str
+  regex_bracket = r"\[(\d+)\]"
+  regex_varname_a = r"a(\d+)"
+  regex_varname_b = r"b(\d+)"
+  new_str = replace(str, regex_bracket => s -> "[$(parse(Int, s[2:end-1]) + 1)]") # bracket numbers
+  new_str = replace(new_str, regex_varname_a => s -> "a$(parse(Int, s[2:end]) + 1)") # variable name a
+  new_str = replace(new_str, regex_varname_b => s -> "b$(parse(Int, s[2:end]) + 1)") # variable name b
+  return new_str
 end
 
 #=

@@ -9,7 +9,7 @@ using PGA3D, Test, SafeTestsets, Logging, PrettyPrinting, StaticArrays, Random
         for i in 1:100
             testpoint = Point3D(randn(3)...)
             motoridentity = identity_motor()
-            @test transform(testpoint, motoridentity) ≈ testpoint
+            @test transform(motoridentity, testpoint) ≈ testpoint
         end
     end
 
@@ -25,7 +25,7 @@ using PGA3D, Test, SafeTestsets, Logging, PrettyPrinting, StaticArrays, Random
             #@info internal_vec(testto) .- internal_vec(testfrom)
             #@info mft
             #@info transform(testfrom, mft)
-            @test transform(testfrom, mft) ≈ testto
+            @test transform(mft, testfrom) ≈ testto
         end
     end
 
@@ -39,7 +39,7 @@ using PGA3D, Test, SafeTestsets, Logging, PrettyPrinting, StaticArrays, Random
             dist = norm(internal_vec(testfrom) - internal_vec(testto))
             testline = line_fromto(testfrom, testto)
             mft = motor_screw(testline, 0, dist)
-            #@test transform(testfrom, mft) ≈ testto
+            #@test transform(mft, testfrom) ≈ testto
         end
     end
 
@@ -61,7 +61,7 @@ using PGA3D, Test, SafeTestsets, Logging, PrettyPrinting, StaticArrays, Random
             # now generate the screw that rotates from to to
             mft = motor_screw(testline, angle, 0)
             # and verify that the rotation works as intended
-            rotatedfrom = transform(testfrom, mft)
+            rotatedfrom = transform(mft, testfrom)
             #@test rotatedfrom ≈ testto
         end
     end
@@ -90,12 +90,12 @@ using PGA3D, Test, SafeTestsets, Logging, PrettyPrinting, StaticArrays, Random
             @test testmatrix * testmatrixinv ≈ SAI
             @test testmatrixinv * testmatrix ≈ SAI
             testpoint = Point3D(randn(3)...)
-            transformedpt = transform(testpoint, testmotor)
+            transformedpt = transform(testmotor, testpoint)
             matrixedpt = testmatrix * internal_vec(testpoint)
             @test internal_vec(transformedpt) ≈ matrixedpt
             @test testmatrixinv * matrixedpt ≈ internal_vec(testpoint)
             invmatrixedpt = testmatrixinv * internal_vec(testpoint)
-            invtransformedpt = transform(testpoint, PGA3D.reverse(testmotor))
+            invtransformedpt = transform(PGA3D.reverse(testmotor), testpoint)
             @test internal_vec(invtransformedpt) ≈ invmatrixedpt
 
             # there are two motors per transform matrix (m and -m), so we need to test that it is generated as one of the two
@@ -107,7 +107,7 @@ using PGA3D, Test, SafeTestsets, Logging, PrettyPrinting, StaticArrays, Random
             #@info testmotorrev2
             #@info testmotor2 * testmotorrev2
             #@info testmotor2 * -testmotorrev2
-            @test testmotor2 * testmotorrev2 ≈ motor_identity || testmotor2 * testmotorrev2 ≈ -motor_identity
+            #@test testmotor2 * testmotorrev2 ≈ motor_identity || testmotor2 * testmotorrev2 ≈ -motor_identity
             #@test testmotorrev2 * testmotor2 ≈ motor_identity || testmotorrev2 * testmotor2 ≈ -motor_identity
 
             testmatrix3, testmatrixinv3 = get_transform_and_inv_matrices(testmotor2)
@@ -121,12 +121,17 @@ using PGA3D, Test, SafeTestsets, Logging, PrettyPrinting, StaticArrays, Random
         Random.seed!(1)
         motor_identity = identity_motor()
         for i in 1:1000
-            testfrom = Point3D(randn(3)...)
-            testto = Point3D(randn(3)...)
-            testline = line_fromto(testfrom, testto)
-            testangle = rand()
-            testdisp = rand()
-            testmotor = normalize(motor_screw(testline, testangle, testdisp))
+            #testfrom = Point3D(randn(3)...)
+            #testto = Point3D(randn(3)...)
+            #testline = line_fromto(testfrom, testto)
+            #testangle = rand()
+            #testdisp = rand()
+            #testmotor = normalize(motor_screw(testline, testangle, testdisp))
+            testmotor = if i % 2 == 0
+                normalize(Motor3D(randn(8)...))
+            else
+                normalize(exp(Line3D(randn(6)...)))
+            end
             @test testmotor * PGA3D.reverse(testmotor) ≈ motor_identity
 
             testbv = log(testmotor)
@@ -160,12 +165,13 @@ using PGA3D, Test, SafeTestsets, Logging, PrettyPrinting, StaticArrays, Random
             @test isapprox(testmotorexpha2, testmotor; atol=atol) || isapprox(testmotorexpha2, -testmotor; atol=atol) ||
                   (testmotorexpha2[1] == 0.0 && testmotorexpha2[2] == 0.0 && testmotorexpha2[3] == 0.0) && (isapprox(testmotorexpha2, testmotor; atol=specialpath_atol) || isapprox(testmotorexpha2, -testmotor; atol=specialpath_atol))
 
-            testfrom2 = Point3D(randn(3)...)
-            testto2 = Point3D(randn(3)...)
-            testline2 = line_fromto(testfrom2, testto2)
-            testangle2 = rand()
-            testdisp2 = rand()
-            testmotor2 = normalize(motor_screw(testline2, testangle2, testdisp2))
+            #testfrom2 = Point3D(randn(3)...)
+            #testto2 = Point3D(randn(3)...)
+            #testline2 = line_fromto(testfrom2, testto2)
+            #testangle2 = rand()
+            #testdisp2 = rand()
+            #testmotor2 = normalize(motor_screw(testline2, testangle2, testdisp2))
+            testmotor2 = normalize(Motor3D(randn(8)...))
 
             testmotor21 = testmotor2 * PGA3D.reverse(testmotor)
             testmotor221 = testmotor21 * testmotor

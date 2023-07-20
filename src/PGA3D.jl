@@ -25,7 +25,7 @@ export internal_vec
 # abstract 4D vector supertype
 export AbstractVector4D # <: AbstractPGA3DElement
 # required interface for subtypes of AbstractVector4D:
-export get_x, get_y, get_z, get_w
+#export get_x, get_y, get_z, get_w
 # basic concrete subtype
 export Vector4D # <: AbstractVector4D
 # this one is a 3D homogenous point using a 4D static vector backend/subtype
@@ -42,12 +42,17 @@ export Line3D
 export line_fromto
 
 export Motor3D
-export get_vx, get_vy, get_vz, get_vw, get_mx, get_my, get_mz, get_mw
 export identity_motor, motor_fromto, transform, motor_screw, motor_translation
 export get_transform_matrix, get_inv_transform_matrix, get_transform_and_inv_matrices
 export get_position, motor_from_transform
 export line_exp, motor_log
 
 export bulk_norm, weight_norm, unitize
+
+export increment_bracket_numbers
+
+export get_scalar, get_e0123
+export get_e23, get_e31, get_e12, get_e01, get_e02, get_e03
+export get_e032, get_e013, get_e021, get_e123
 
 end
