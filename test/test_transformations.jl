@@ -72,7 +72,7 @@ using PGA3D, Test, SafeTestsets, Logging, PrettyPrinting, StaticArrays, Random
         special_motor_point_test_list = collect(Iterators.product(PGA3D.special_motors, PGA3D.special_points))
         Random.seed!(1)
         atol = 1e-8
-        for i in 1:10000
+        for i in 1:10_000
             (; testmotorprenorm, testpoint) = if i <= length(special_motor_point_test_list)
                 testmotorprenorm = special_motor_point_test_list[i][1]
                 testpoint = special_motor_point_test_list[i][2]
@@ -135,7 +135,7 @@ using PGA3D, Test, SafeTestsets, Logging, PrettyPrinting, StaticArrays, Random
         specialpath_atol = 1e-3
         motor_identity = identity_motor()
         special_motor_test_list = PGA3D.special_motors
-        for i in 1:10000
+        for i in 1:10_000
             testmotorprenorm = if i <= length(special_motor_test_list)
                 special_motor_test_list[i]
             else
