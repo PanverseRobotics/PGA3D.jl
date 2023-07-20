@@ -18,6 +18,7 @@ include("regressive_product.jl")
 include("geometric_product.jl")
 include("element_construction.jl")
 include("transformations.jl")
+include("transform_matrix.jl")
 
 export AbstractPGA3DElement
 # required interface for subtypes of AbstractPGA3Element:
