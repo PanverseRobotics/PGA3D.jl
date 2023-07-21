@@ -208,6 +208,21 @@ using PGA3D, Test, SafeTestsets, Logging, PrettyPrinting, StaticArrays, Random
         specialpath_atol = 1e-3
         motor_identity = identity_motor()
         special_line_test_list = PGA3D.special_lines
+
+        function taylor_exp(B::Line3D)
+            # 20 terms
+            R = Motor3D(1.0, 0, 0, 0, 0, 0, 0, 0)
+            BMotor = Motor3D(0, B[1], B[2], B[3], B[4], B[5], B[6], 0)
+            C = BMotor
+            f = 1.0
+            for i in 1:20
+                R = R + C * (1.0 / f)
+                C = C * BMotor
+                f = f * (i + 1)
+            end
+            return R
+        end
+
         for i in 1:10_000
             testline = if i <= length(special_line_test_list)
                 special_line_test_list[i]
@@ -219,6 +234,8 @@ using PGA3D, Test, SafeTestsets, Logging, PrettyPrinting, StaticArrays, Random
             end
 
             testmotor = exp(testline)
+            testmotortaylor = taylor_exp(testline)
+            @test isapprox(testmotor, testmotortaylor; atol=atol)
             testline2 = log(testmotor)
             @test isapprox(testline2, testline; atol=atol)
 
