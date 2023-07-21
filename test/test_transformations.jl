@@ -67,7 +67,7 @@ using PGA3D, Test, SafeTestsets, Logging, PrettyPrinting, StaticArrays, Random
     end
 
     @safetestset "Motor to and from TransformMatrix" begin
-        using PGA3D, Test, SafeTestsets, Logging, PrettyPrinting, StaticArrays, Random, LinearAlgebra
+        using PGA3D, Test, SafeTestsets, Logging, StaticArrays, Random, LinearAlgebra
         motor_identity = identity_motor()
         # ensures that each special motor is tested vs rand points and vice versa in addition to all special x special combos
         special_and_rand_motors = vcat(PGA3D.special_motors, [Motor3D(randn(8)...) for i in 1:50])
