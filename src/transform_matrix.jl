@@ -4,18 +4,25 @@ function get_transform_matrix(a::Motor3D)
         (a[1]^2+a[2]^2-(a[3]^2)-(a[4]^2)) (2(a[2]*a[3]+a[1]*a[4])) (2(a[2]*a[4]-a[1]*a[3])) (2(a[7]*a[3]-a[5]*a[1]-a[8]*a[2]-a[6]*a[4]))
         (2(a[2]*a[3]-a[1]*a[4])) (a[1]^2+a[3]^2-(a[2]^2)-(a[4]^2)) (2(a[1]*a[2]+a[3]*a[4])) (2(a[5]*a[4]-a[8]*a[3]-a[6]*a[1]-a[7]*a[2]))
         (2(a[1]*a[3]+a[2]*a[4])) (2(a[3]*a[4]-a[1]*a[2])) (a[1]^2+a[4]^2-(a[2]^2)-(a[3]^2)) (2(a[6]*a[2]-a[5]*a[3]-a[8]*a[4]-a[7]*a[1]))
-        0 0 0 1
+        0 0 0 (a[1]^2+a[2]^2+a[3]^2+a[4]^2)
     ]
 end
 
-function get_inv_transform_matrix(a_ununitized::Motor3D)
-    inv(get_transform_matrix(a_ununitized))
+function get_inv_transform_matrix(a::Motor3D)
+    return inv(get_transform_matrix(a))
 end
 
-function get_transform_and_inv_matrices(a_ununitized::Motor3D)
-    matrix = get_transform_matrix(a_ununitized)
-    inv_matrix = get_inv_transform_matrix(a_ununitized)
-    (; matrix, inv_matrix)
+function get_transform_and_inv_matrices(a::Motor3D)
+    matrix = get_transform_matrix(a)
+    inv_matrix = get_inv_transform_matrix(a)
+    return (; matrix, inv_matrix)
+end
+
+function get_position(a::Motor3D)
+    return Point3D((2(a[7] * a[3] - a[5] * a[1] - a[8] * a[2] - a[6] * a[4])),
+        (2(a[5] * a[4] - a[8] * a[3] - a[6] * a[1] - a[7] * a[2])),
+        (2(a[6] * a[2] - a[5] * a[3] - a[8] * a[4] - a[7] * a[1])),
+        (a[1]^2 + a[2]^2 + a[3]^2 + a[4]^2))
 end
 
 
@@ -41,7 +48,7 @@ function motor_from_transform(M::SMatrix{4,4,T}) where {T<:Number}
     # this last part is a guaranteed translation that makes sure the intersection point
     # of the three input planes is at 1e123.
     # This is a translation with a distance determined by the third plane along a line
-    # determined by the 2nd plane inside the first plane. 
+    # determined by the 2nd plane inside the first plane.
     p123 = p12 ∧ p3
     m3 = sqrt(Point3D(0, 0, 0, 1) * inv(transform(m2, p123))) * m2
 
