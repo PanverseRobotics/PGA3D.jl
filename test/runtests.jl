@@ -1,4 +1,4 @@
-using Test, SafeTestsets, Logging, PrettyPrinting
+using Test, SafeTestsets, Logging
 
 @info "Starting tests"
 
@@ -29,7 +29,3 @@ fulltestset = @testset "PGA3D.jl" begin
 end
 
 @info "Testing finished executing."
-
-#@info "Test Results:"
-#@info pprint(fulltestset.results)
-#@info "Done with runtest."
