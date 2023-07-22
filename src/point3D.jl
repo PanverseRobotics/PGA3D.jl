@@ -24,6 +24,8 @@ end
 
 internal_vec(p::Point3D) = p.vec
 
+raw_vec3(p::Point3D) = SA[p[1], p[2], p[3]]
+
 const special_points = SA[
     Point3D(0, 0, 0, 0),
     Point3D(1, 0, 0, 0), Point3D(-1, 0, 0, 0),
@@ -68,4 +70,3 @@ function Base.inv(a::Point3D)
     end
 
 end
-

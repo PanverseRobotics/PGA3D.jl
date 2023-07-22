@@ -25,6 +25,7 @@ export AbstractPGA3DElement
 export internal_vec
 
 export Point3D
+export raw_vec3
 
 export Line3D
 export line_fromto
@@ -32,6 +33,7 @@ export line_fromto
 export Plane3D
 
 export Motor3D
+export get_rotor
 export identity_motor, motor_fromto, transform, motor_screw, motor_translation
 export get_transform_matrix, get_inv_transform_matrix, get_transform_and_inv_matrices
 export get_position, motor_from_transform

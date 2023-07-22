@@ -33,6 +33,8 @@ Base.:(-)(a::Motor3D) = Motor3D(-internal_vec(a))
 Base.:(*)(a::Motor3D, b::Real) = Motor3D((internal_vec(a) .* b)) # this needs to be Real otherwise it might trigger on PGA elements oop
 Base.:(*)(a::Real, b::Motor3D) = Motor3D((a .* internal_vec(b))) # this needs to be Real otherwise it might trigger on PGA elements oop
 
+get_rotor(a::Motor3D) = Motor3D(a[1], a[2], a[3], a[4], 0, 0, 0, 0)
+
 # this is the one from enki's stuff, translated
 
 identity_motor() = Motor3D(1, 0, 0, 0, 0, 0, 0, 0)
@@ -157,8 +159,3 @@ function Base.inv(a::Motor3D)
             (-a1a1a1a1 * a[8] + a2a2a2a2 * a[8] + a3a3a3a3 * a[8] + a4a4a4a4 * a[8] + 2 * (a1a1a1 * a2a5 + a1a1a1 * a3a6 + a1a1a1 * a4a7 + a[1] * a2a2a2a5 + a1a2a2 * a3a6 + a1a2a2 * a4a7 + a1a2a5 * a3a3 + a1a2a5 * a4a4 + a[1] * a3a3a3a6 + a[1] * a3a3a4a7 + a[1] * a3a6a4a4 + a[1] * a4a4a4a7 + a2a2a3a3 * a[8] + a2a2a4a4 * a[8] + a3a3a4a4 * a[8])) / (D2))
     end
 end
-
-
-
-
-
