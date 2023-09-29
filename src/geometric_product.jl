@@ -42,3 +42,12 @@ function Base.:(*)(a::Motor3D, b::Motor3D)
         a[1] * b[8] + a[2] * b[5] + a[3] * b[6] + a[4] * b[7] + a[5] * b[2] + a[6] * b[3] + a[7] * b[4] + a[8] * b[1]
     )
 end
+
+function Base.:(*)(a::Rotor3D, b::Rotor3D)
+    return Rotor3D(
+        a[1] * b[1] - a[2] * b[2] - a[3] * b[3] - a[4] * b[4],
+        a[1] * b[2] + a[2] * b[1] - a[3] * b[4] + a[4] * b[3],
+        a[1] * b[3] + a[2] * b[4] + a[3] * b[1] - a[4] * b[2],
+        a[1] * b[4] - a[2] * b[3] + a[3] * b[2] + a[4] * b[1]
+    )
+end

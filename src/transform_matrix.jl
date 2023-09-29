@@ -25,6 +25,13 @@ function get_position(a::Motor3D)
         (a[1]^2 + a[2]^2 + a[3]^2 + a[4]^2))
 end
 
+function get_rotation_matrix(a::Rotor3D)
+    return SA[
+        (a[1]^2+a[2]^2-(a[3]^2)-(a[4]^2)) (2(a[2]*a[3]+a[1]*a[4])) (2(a[2]*a[4]-a[1]*a[3]))
+        (2(a[2]*a[3]-a[1]*a[4])) (a[1]^2+a[3]^2-(a[2]^2)-(a[4]^2)) (2(a[1]*a[2]+a[3]*a[4]))
+        (2(a[1]*a[3]+a[2]*a[4])) (2(a[3]*a[4]-a[1]*a[2])) (a[1]^2+a[4]^2-(a[2]^2)-(a[3]^2))
+    ]
+end
 
 #=
 # I wanted this to work but it doesn't handle the edge cases well enough and I don't know how to modify it to do so
