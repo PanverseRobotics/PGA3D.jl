@@ -10,6 +10,7 @@ include("abstract_types.jl")
 include("point3D.jl")
 include("line3D.jl")
 include("plane3D.jl")
+include("rotor3D.jl")
 include("motor3D.jl")
 include("conversions.jl")
 include("dual.jl")
@@ -37,6 +38,9 @@ export get_rotor
 export identity_motor, motor_fromto, transform, motor_screw, motor_translation
 export get_transform_matrix, get_inv_transform_matrix, get_transform_and_inv_matrices
 export get_position, motor_from_transform
+
+export Rotor3D
+export get_rotation_matrix
 
 export bulk_norm, weight_norm, unitize
 export dual, undual
