@@ -33,7 +33,7 @@ Base.:(-)(a::Motor3D) = Motor3D(-internal_vec(a))
 Base.:(*)(a::Motor3D, b::Real) = Motor3D((internal_vec(a) .* b)) # this needs to be Real otherwise it might trigger on PGA elements oop
 Base.:(*)(a::Real, b::Motor3D) = Motor3D((a .* internal_vec(b))) # this needs to be Real otherwise it might trigger on PGA elements oop
 
-get_rotor(a::Motor3D) = Motor3D(a[1], a[2], a[3], a[4], 0, 0, 0, 0)
+get_rotor(a::Motor3D) = Rotor3D(a[1], a[2], a[3], a[4])
 
 # this is the one from enki's stuff, translated
 

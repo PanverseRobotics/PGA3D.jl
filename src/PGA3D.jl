@@ -43,6 +43,8 @@ export get_position, motor_from_transform
 export Rotor3D
 export get_rotation_matrix
 
+export Translator3D
+
 export bulk_norm, weight_norm, unitize
 export dual, undual
 

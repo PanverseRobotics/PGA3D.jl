@@ -7,6 +7,12 @@ struct Translator3D{T<:Number} <: AbstractPGA3DElement{T}
         return new{T}(vec)
     end
 
+    function Translator3D(scalar::Number, e01::Number, e02::Number, e03::Number)
+        T = promote_type(eltype(scalar), eltype(e01), eltype(e02), eltype(e03))
+        vec = SVector{4,T}(promote(scalar, e01, e02, e03)...)
+        return new{T}(vec)
+    end
+
     function Translator3D(vec::SVector{3,T}) where {T<:Number}
         one_cat_vec = SVector{4,T}(promote(1, vec...)...)
         return new{T}(one_cat_vec)
