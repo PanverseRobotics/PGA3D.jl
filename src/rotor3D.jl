@@ -22,3 +22,19 @@ get_scalar(a::Rotor3D) = a[1]
 get_e23(a::Rotor3D) = a[2]
 get_e31(a::Rotor3D) = a[3]
 get_e12(a::Rotor3D) = a[4]
+
+function LinearAlgebra.normalize(r::Rotor3D)
+    wnmsq = r[1] * r[1] + r[2] * r[2] + r[3] * r[3] + r[4] * r[4]
+    if wnmsq ≈ 0 || wnmsq < 0
+        throw(DomainError(m, "Rotor3D must have a non-zero rotational part to normalize."))
+    else
+        wnm = sqrt(wnmsq)
+        A = 1 / wnm
+        return Rotor3D(
+            A * r[1],
+            A * r[2],
+            A * r[3],
+            A * r[4]
+        )
+    end
+end
